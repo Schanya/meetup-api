@@ -22,9 +22,27 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Meetup-api
+CRUD REST Web API for organizing of meetups
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Web API functionality:
+1. Getting a list of all meetups;
+2. Getting a certain meetup by its Id;
+3. Registration of a new meetup;
+4. Changing information about an existing meetup;
+5. Removing the meetup.
+
+Meetup's information:
+1. Title / topic;
+2. Description;
+3. A set of tags / keywords;
+4. Time and place of the event.
+
+Technology stack:
+1. Node.js;
+2. Nest.js;
+3. PostgreSQL 14;
+4. Sequelize.
 
 ## Installation
 
