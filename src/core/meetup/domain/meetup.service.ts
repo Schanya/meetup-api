@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { FlagService } from 'src/core/flag/domain/flag.service';
@@ -20,5 +20,18 @@ export class MeetupService {
 		});
 
 		return suitableMeetups;
+	}
+
+	public async findBy(options: MeetupOptions): Promise<Meetup> {
+		const suitableMeetup = await this.meetupRepository.findOne({
+			where: { ...options },
+			include: { all: true },
+		});
+
+		if (!suitableMeetup) {
+			throw new BadRequestException("There isn't suitable meetup");
+		}
+
+		return suitableMeetup;
 	}
 }
