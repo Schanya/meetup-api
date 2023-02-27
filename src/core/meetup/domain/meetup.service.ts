@@ -77,4 +77,15 @@ export class MeetupService {
 
 		return createdMeetup;
 	}
+
+	public async delete(id: number): Promise<number> {
+		const numberDeletedRows = await this.meetupRepository.destroy({
+			where: { id },
+		});
+
+		if (!numberDeletedRows)
+			throw new BadRequestException('There is no suitable meetup');
+
+		return numberDeletedRows;
+	}
 }

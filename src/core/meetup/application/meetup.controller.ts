@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpStatus,
 	Param,
@@ -37,5 +38,12 @@ export class MeetupController {
 		res.status(HttpStatus.OK).send({
 			message: `Meetup ${meetup.title} created successfully`,
 		});
+	}
+
+	@Delete(':id')
+	async delete(@Param('id') id: number, @Res() res: Response) {
+		await this.meetupService.delete(id);
+
+		res.status(HttpStatus.OK).send({ message: `Meetup deleted successfully` });
 	}
 }
