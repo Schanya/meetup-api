@@ -36,6 +36,26 @@ export class MeetupService {
 		return suitableMeetup;
 	}
 
+	private async flagArrayHandler(flags: string[]): Promise<Flag[]> {
+		let resultFlags: Flag[] = [];
+
+		for await (const flag of flags) {
+			const existingFlag = await this.flagService.findBy({
+				name: flag,
+			});
+
+			resultFlags.push(
+				!existingFlag
+					? await this.flagService.create({
+							name: flag,
+					  })
+					: existingFlag,
+			);
+		}
+
+		return resultFlags;
+	}
+
 	public async create(meetupDto: MeetupDto): Promise<Meetup> {
 		// const existingMeetup = await this.findBy({ title: meetupDto.title }); Should title be uniq?
 
@@ -43,35 +63,17 @@ export class MeetupService {
 		// 	throw new BadRequestException('Such meetup has already exist');
 		// }
 
-		let meetupDtoWithoutFlags = { ...meetupDto };
-		delete meetupDtoWithoutFlags.flags;
+		const resultFlags = await this.flagArrayHandler(meetupDto.flags);
 
-		const createdMeetup = await this.meetupRepository.create(
-			meetupDtoWithoutFlags,
-		);
+		const { flags, ...rest } = meetupDto;
 
-		let flags: Flag[] = [];
-		for await (const flag of meetupDto.flags) {
-			const existingFlag = await this.flagService.findBy({
-				name: flag,
-			});
+		const createdMeetup = await this.meetupRepository.create(meetupDto);
 
-			if (!existingFlag) {
-				const createdFlag = await this.flagService.create({
-					name: flag,
-				});
-
-				await createdMeetup.$add('flags', createdFlag);
-
-				flags.push(createdFlag);
-			} else {
-				await createdMeetup.$add('flags', existingFlag);
-
-				flags.push(existingFlag);
-			}
+		for await (const flag of resultFlags) {
+			await createdMeetup.$add('flags', flag);
 		}
 
-		createdMeetup.flags = flags;
+		createdMeetup.flags = resultFlags;
 
 		await createdMeetup.save();
 
