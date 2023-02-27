@@ -1,7 +1,16 @@
-import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpStatus,
+	Param,
+	Post,
+	Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 
 import { MeetupService } from '../domain/meetup.service';
+import { MeetupDto } from '../presentation/meetup.dto';
 
 @Controller('meetup')
 export class MeetupController {
@@ -19,5 +28,14 @@ export class MeetupController {
 		const meetups = await this.meetupService.findBy({ id: id });
 
 		res.status(HttpStatus.OK).send(meetups);
+	}
+
+	@Post()
+	async create(@Body() meetupDto: MeetupDto, @Res() res: Response) {
+		const meetup = await this.meetupService.create(meetupDto);
+
+		res.status(HttpStatus.OK).send({
+			message: `Meetup ${meetup.title} created successfully`,
+		});
 	}
 }
