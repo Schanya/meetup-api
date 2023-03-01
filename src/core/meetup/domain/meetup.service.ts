@@ -4,7 +4,11 @@ import { Flag } from 'src/core/flag/domain/flag.entity';
 
 import { FlagService } from 'src/core/flag/domain/flag.service';
 
-import { MeetupDto, MeetupOptions } from '../presentation/meetup.dto';
+import {
+	MeetupDto,
+	MeetupOptions,
+	UpdateMeetupOptions,
+} from '../presentation/meetup.dto';
 import { Meetup } from './meetup.entity';
 
 @Injectable()
@@ -78,6 +82,41 @@ export class MeetupService {
 		await createdMeetup.save();
 
 		return createdMeetup;
+	}
+
+	public async update(
+		id: number,
+		meetupOptions: MeetupOptions,
+	): Promise<Meetup> {
+		const existingMeetup = await this.findBy({ id: id });
+
+		if (!existingMeetup) {
+			throw new BadRequestException("Such meetup doesn't exist");
+		}
+
+		// const existingMeetup = await this.findBy({ title: meetupDto.title });  Should title be uniq?
+
+		// if (existingMeetup) {
+		// 	throw new BadRequestException('Such meetup has already exist');
+		// }
+
+		const updateMeetupOptions: UpdateMeetupOptions = {
+			...meetupOptions,
+		};
+
+		await this.meetupRepository.update(updateMeetupOptions, {
+			where: { id },
+		});
+
+		const existingFlags: Flag[] = await existingMeetup.$get('flags');
+		await existingMeetup.$remove('flags', existingFlags);
+
+		const resultFlags = await this.flagArrayHandler(meetupOptions.flags);
+		await existingMeetup.$add('flags', resultFlags);
+
+		const updatedMeetup = await this.findBy({ id: id });
+
+		return updatedMeetup;
 	}
 
 	public async delete(id: number): Promise<number> {

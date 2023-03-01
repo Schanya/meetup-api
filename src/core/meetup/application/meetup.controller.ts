@@ -6,12 +6,13 @@ import {
 	HttpStatus,
 	Param,
 	Post,
+	Put,
 	Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 
 import { MeetupService } from '../domain/meetup.service';
-import { MeetupDto } from '../presentation/meetup.dto';
+import { MeetupDto, MeetupOptions } from '../presentation/meetup.dto';
 
 @Controller('meetup')
 export class MeetupController {
@@ -38,6 +39,20 @@ export class MeetupController {
 		res.status(HttpStatus.OK).send({
 			message: `Meetup ${meetup.title} created successfully`,
 		});
+	}
+
+	@Put(':id')
+	async update(
+		@Param('id')
+		id: number,
+		@Body() meetupOptions: MeetupOptions,
+		@Res() res: Response,
+	) {
+		const updatedMeetup = await this.meetupService.update(id, meetupOptions);
+
+		res
+			.status(HttpStatus.OK)
+			.send({ message: `Meetup ${updatedMeetup.title} updated successfully` });
 	}
 
 	@Delete(':id')
