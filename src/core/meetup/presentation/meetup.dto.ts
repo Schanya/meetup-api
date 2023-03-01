@@ -7,6 +7,8 @@ import {
 	IsInt,
 	IsArray,
 	IsDefined,
+	IsEmpty,
+	IsOptional,
 } from 'class-validator';
 
 export class MeetupDto {
@@ -24,7 +26,10 @@ export class MeetupDto {
 	flags: string[];
 
 	@IsNotEmpty()
-	@Transform(() => Date)
+	@Transform(({ value }) => {
+		value = value.split(' ').join('T') + '+0000';
+		return new Date(value);
+	})
 	@IsDate()
 	time: Date;
 
@@ -34,20 +39,59 @@ export class MeetupDto {
 }
 
 export class MeetupOptions {
+	@IsOptional()
 	@IsInt()
 	id?: number;
 
+	@IsOptional()
 	@MaxLength(255)
 	@IsString()
 	title?: string;
 
+	@IsOptional()
 	@IsString()
 	discription?: string;
 
-	@Transform(() => Date)
+	@IsOptional()
+	@IsDefined()
+	@IsArray()
+	@IsString({ each: true })
+	flags?: string[];
+
+	@IsOptional()
+	@IsNotEmpty()
+	@Transform(({ value }) => {
+		value = value.split(' ').join('T') + '+0000';
+		return new Date(value);
+	})
 	@IsDate()
 	time?: Date;
 
+	@IsOptional()
+	@IsString()
+	place?: string;
+}
+
+export class UpdateMeetupOptions {
+	@IsOptional()
+	@MaxLength(255)
+	@IsString()
+	title?: string;
+
+	@IsOptional()
+	@IsString()
+	discription?: string;
+
+	@IsOptional()
+	@IsNotEmpty()
+	@Transform(({ value }) => {
+		value = value.split(' ').join('T') + '+0000';
+		return new Date(value);
+	})
+	@IsDate()
+	time?: Date;
+
+	@IsOptional()
 	@IsString()
 	place?: string;
 }
