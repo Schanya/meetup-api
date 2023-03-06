@@ -7,7 +7,6 @@ import {
 	IsInt,
 	IsArray,
 	IsDefined,
-	IsEmpty,
 	IsOptional,
 } from 'class-validator';
 
@@ -26,10 +25,7 @@ export class MeetupDto {
 	flags: string[];
 
 	@IsNotEmpty()
-	@Transform(({ value }) => {
-		value = value.split(' ').join('T') + '+0000';
-		return new Date(value);
-	})
+	@Transform(({ value }) => new Date(value))
 	@IsDate()
 	time: Date;
 
@@ -60,10 +56,7 @@ export class MeetupOptions {
 
 	@IsOptional()
 	@IsNotEmpty()
-	@Transform(({ value }) => {
-		value = value.split(' ').join('T') + '+0000';
-		return new Date(value);
-	})
+	@Transform(({ value }) => new Date(value))
 	@IsDate()
 	time?: Date;
 
@@ -84,10 +77,7 @@ export class UpdateMeetupOptions {
 
 	@IsOptional()
 	@IsNotEmpty()
-	@Transform(({ value }) => {
-		value = value.split(' ').join('T') + '+0000';
-		return new Date(value);
-	})
+	@Transform(({ value }) => new Date(value))
 	@IsDate()
 	time?: Date;
 
