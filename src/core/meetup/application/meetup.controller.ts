@@ -3,13 +3,13 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
 	HttpStatus,
 	Param,
 	Post,
 	Put,
 	Res,
 } from '@nestjs/common';
-import { Response } from 'express';
 
 import { MeetupService } from '../domain/meetup.service';
 import { MeetupDto, MeetupOptions } from '../presentation/meetup.dto';
@@ -18,47 +18,49 @@ import { MeetupDto, MeetupOptions } from '../presentation/meetup.dto';
 export class MeetupController {
 	constructor(readonly meetupService: MeetupService) {}
 
+	@HttpCode(HttpStatus.OK)
 	@Get()
-	async getAll(@Res() res: Response) {
+	async getAll() {
 		const meetups = await this.meetupService.findAll({});
 
-		res.status(HttpStatus.OK).send(meetups);
+		return { meetups: meetups };
 	}
 
+	@HttpCode(HttpStatus.OK)
 	@Get(':id')
-	async getOne(@Param('id') id: number, @Res() res: Response) {
-		const meetups = await this.meetupService.findBy({ id: id });
+	async getOne(@Param('id') id: number) {
+		const meetup = await this.meetupService.findBy({ id: id });
 
-		res.status(HttpStatus.OK).send(meetups);
+		return meetup;
 	}
 
+	@HttpCode(HttpStatus.CREATED)
 	@Post()
-	async create(@Body() meetupDto: MeetupDto, @Res() res: Response) {
+	async create(@Body() meetupDto: MeetupDto) {
 		const meetup = await this.meetupService.create(meetupDto);
 
-		res.status(HttpStatus.OK).send({
+		return {
 			message: `Meetup ${meetup.title} created successfully`,
-		});
+		};
 	}
 
+	@HttpCode(HttpStatus.OK)
 	@Put(':id')
 	async update(
 		@Param('id')
 		id: number,
 		@Body() meetupOptions: MeetupOptions,
-		@Res() res: Response,
 	) {
 		const updatedMeetup = await this.meetupService.update(id, meetupOptions);
 
-		res
-			.status(HttpStatus.OK)
-			.send({ message: `Meetup ${updatedMeetup.title} updated successfully` });
+		return { message: `Meetup ${updatedMeetup.title} updated successfully` };
 	}
 
+	@HttpCode(HttpStatus.OK)
 	@Delete(':id')
-	async delete(@Param('id') id: number, @Res() res: Response) {
+	async delete(@Param('id') id: number) {
 		await this.meetupService.delete(id);
 
-		res.status(HttpStatus.OK).send({ message: `Meetup deleted successfully` });
+		return { message: `Meetup deleted successfully` };
 	}
 }
