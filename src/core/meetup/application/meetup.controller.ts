@@ -8,7 +8,6 @@ import {
 	Param,
 	Post,
 	Put,
-	Res,
 } from '@nestjs/common';
 
 import { MeetupService } from '../domain/meetup.service';
@@ -23,7 +22,7 @@ export class MeetupController {
 	async getAll() {
 		const meetups = await this.meetupService.findAll({});
 
-		return { meetups: meetups };
+		return meetups;
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -39,9 +38,7 @@ export class MeetupController {
 	async create(@Body() meetupDto: MeetupDto) {
 		const meetup = await this.meetupService.create(meetupDto);
 
-		return {
-			message: `Meetup ${meetup.title} created successfully`,
-		};
+		return `Meetup ${meetup.title} created successfully`;
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -53,7 +50,7 @@ export class MeetupController {
 	) {
 		const updatedMeetup = await this.meetupService.update(id, meetupOptions);
 
-		return { message: `Meetup ${updatedMeetup.title} updated successfully` };
+		return `Meetup ${updatedMeetup.title} updated successfully`;
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -61,6 +58,6 @@ export class MeetupController {
 	async delete(@Param('id') id: number) {
 		await this.meetupService.delete(id);
 
-		return { message: `Meetup deleted successfully` };
+		return `Meetup deleted successfully`;
 	}
 }

@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, MaxLength, IsInt } from 'class-validator';
+import {
+	IsString,
+	IsNotEmpty,
+	MaxLength,
+	IsInt,
+	IsOptional,
+} from 'class-validator';
 
 export class FlagDto {
 	@IsNotEmpty()
@@ -8,9 +14,11 @@ export class FlagDto {
 }
 
 export class FlagOptions {
+	@IsOptional()
 	@IsInt()
 	id?: number;
 
+	@IsOptional()
 	@MaxLength(255)
 	@IsString()
 	name?: string;
