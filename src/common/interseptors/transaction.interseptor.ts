@@ -36,7 +36,10 @@ export class TransactionInterceptor implements NestInterceptor {
 			catchError(async (err) => {
 				await transaction.rollback();
 				const message =
-					err instanceof HttpException ? err.message : 'Transaction rolback';
+					err instanceof HttpException
+						? err.getResponse()
+						: 'Transaction rolback';
+
 				const status =
 					err instanceof HttpException
 						? err.getStatus()
