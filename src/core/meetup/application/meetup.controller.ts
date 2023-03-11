@@ -16,6 +16,7 @@ import { TransactionInterceptor } from 'src/common/interseptors/transaction.inte
 
 import { MeetupService } from '../domain/meetup.service';
 import { MeetupDto, MeetupOptions } from '../presentation/meetup.dto';
+import { FrontendMeetup } from '../presentation/meetup.type';
 
 @Controller('meetup')
 export class MeetupController {
@@ -23,10 +24,10 @@ export class MeetupController {
 
 	@HttpCode(HttpStatus.OK)
 	@Get()
-	async getAll() {
+	async getAll(): Promise<FrontendMeetup[]> {
 		const meetups = await this.meetupService.findAll({});
 
-		return meetups;
+		return meetups.map((meetup) => new FrontendMeetup(meetup));
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -34,7 +35,7 @@ export class MeetupController {
 	async getOne(@Param('id') id: number) {
 		const meetup = await this.meetupService.findBy({ id: id });
 
-		return meetup;
+		return new FrontendMeetup(meetup);
 	}
 
 	@UseInterceptors(TransactionInterceptor)
@@ -46,7 +47,7 @@ export class MeetupController {
 	) {
 		const meetup = await this.meetupService.create(meetupDto, transaction);
 
-		return `Meetup ${meetup.title} created successfully`;
+		return new FrontendMeetup(meetup);
 	}
 
 	@UseInterceptors(TransactionInterceptor)
@@ -64,7 +65,7 @@ export class MeetupController {
 			transaction,
 		);
 
-		return `Meetup ${updatedMeetup.title} updated successfully`;
+		return new FrontendMeetup(updatedMeetup);
 	}
 
 	@UseInterceptors(TransactionInterceptor)
