@@ -1,8 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Flag } from 'src/core/flag/domain/flag.entity';
-
-import { FlagService } from 'src/core/flag/domain/flag.service';
+import { Transaction } from 'sequelize';
 
 import {
 	MeetupDto,
@@ -10,6 +8,9 @@ import {
 	UpdateMeetupOptions,
 } from '../presentation/meetup.dto';
 import { Meetup } from './meetup.entity';
+
+import { Flag } from 'src/core/flag/domain/flag.entity';
+import { FlagService } from 'src/core/flag/domain/flag.service';
 
 @Injectable()
 export class MeetupService {
@@ -60,26 +61,23 @@ export class MeetupService {
 		return resultFlags;
 	}
 
-	public async create(meetupDto: MeetupDto): Promise<Meetup> {
-		// const existingMeetup = await this.findBy({ title: meetupDto.title }); Should title be uniq?
-
-		// if (existingMeetup) {
-		// 	throw new BadRequestException('Such meetup has already exist');
-		// }
-
+	public async create(
+		meetupDto: MeetupDto,
+		transaction: Transaction,
+	): Promise<Meetup> {
 		const resultFlags = await this.flagArrayHandler(meetupDto.flags);
 
 		const { flags, ...rest } = meetupDto;
 
-		const createdMeetup = await this.meetupRepository.create(meetupDto);
+		const createdMeetup = await this.meetupRepository.create(meetupDto, {
+			transaction,
+		});
 
 		for await (const flag of resultFlags) {
-			await createdMeetup.$add('flags', flag);
+			await createdMeetup.$add('flags', flag, { transaction });
 		}
 
-		createdMeetup.flags = resultFlags;
-
-		await createdMeetup.save();
+		await createdMeetup.save({ transaction });
 
 		return createdMeetup;
 	}
@@ -87,6 +85,7 @@ export class MeetupService {
 	public async update(
 		id: number,
 		meetupOptions: MeetupOptions,
+		transaction: Transaction,
 	): Promise<Meetup> {
 		const existingMeetup = await this.findBy({ id: id });
 
@@ -94,34 +93,30 @@ export class MeetupService {
 			throw new BadRequestException("Such meetup doesn't exist");
 		}
 
-		// const existingMeetup = await this.findBy({ title: meetupDto.title });  Should title be uniq?
-
-		// if (existingMeetup) {
-		// 	throw new BadRequestException('Such meetup has already exist');
-		// }
-
 		const updateMeetupOptions: UpdateMeetupOptions = {
 			...meetupOptions,
 		};
 
 		await this.meetupRepository.update(updateMeetupOptions, {
 			where: { id },
+			transaction,
 		});
 
 		const existingFlags: Flag[] = await existingMeetup.$get('flags');
-		await existingMeetup.$remove('flags', existingFlags);
+		await existingMeetup.$remove('flags', existingFlags, { transaction });
 
 		const resultFlags = await this.flagArrayHandler(meetupOptions.flags);
-		await existingMeetup.$add('flags', resultFlags);
+		await existingMeetup.$add('flags', resultFlags, { transaction });
 
 		const updatedMeetup = await this.findBy({ id: id });
 
 		return updatedMeetup;
 	}
 
-	public async delete(id: number): Promise<number> {
+	public async delete(id: number, transaction: Transaction): Promise<number> {
 		const numberDeletedRows = await this.meetupRepository.destroy({
 			where: { id },
+			transaction,
 		});
 
 		if (!numberDeletedRows)
