@@ -77,6 +77,8 @@ export class MeetupService {
 			await createdMeetup.$add('flags', flag, { transaction });
 		}
 
+		createdMeetup.flags = resultFlags;
+
 		await createdMeetup.save({ transaction });
 
 		return createdMeetup;
@@ -108,9 +110,9 @@ export class MeetupService {
 		const resultFlags = await this.flagArrayHandler(meetupOptions.flags);
 		await existingMeetup.$add('flags', resultFlags, { transaction });
 
-		const updatedMeetup = await this.findBy({ id: id });
+		existingMeetup.flags = resultFlags;
 
-		return updatedMeetup;
+		return existingMeetup;
 	}
 
 	public async delete(id: number, transaction: Transaction): Promise<number> {
