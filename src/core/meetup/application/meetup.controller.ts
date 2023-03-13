@@ -8,6 +8,7 @@ import {
 	Param,
 	Post,
 	Put,
+	Query,
 	UseInterceptors,
 } from '@nestjs/common';
 import { Transaction } from 'sequelize';
@@ -15,7 +16,11 @@ import { TransactionParam } from 'src/common/decorators/transaction.decorator';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
 
 import { MeetupService } from '../domain/meetup.service';
-import { MeetupDto, MeetupOptions } from '../presentation/meetup.dto';
+import {
+	MeetupDto,
+	MeetupOptions,
+	ReadAllMeetupDto,
+} from '../presentation/meetup.dto';
 import { FrontendMeetup } from '../presentation/meetup.type';
 
 @Controller('meetup')
@@ -24,8 +29,16 @@ export class MeetupController {
 
 	@HttpCode(HttpStatus.OK)
 	@Get()
-	async getAll(): Promise<FrontendMeetup[]> {
-		const meetups = await this.meetupService.findAll({});
+	async getAll(
+		@Query() readAllMeetupDto: ReadAllMeetupDto,
+	): Promise<FrontendMeetup[]> {
+		const { pagination, sorting, ...filter } = readAllMeetupDto;
+
+		const meetups = await this.meetupService.findAll({
+			pagination,
+			sorting,
+			filter,
+		});
 
 		return meetups.map((meetup) => new FrontendMeetup(meetup));
 	}

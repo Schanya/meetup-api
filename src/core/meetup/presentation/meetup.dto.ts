@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
 	IsString,
 	IsNotEmpty,
@@ -9,6 +9,8 @@ import {
 	IsDefined,
 	IsOptional,
 } from 'class-validator';
+import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
+import { Flag } from 'src/core/flag/domain/flag.entity';
 
 export class MeetupDto {
 	@IsNotEmpty()
@@ -53,6 +55,33 @@ export class MeetupOptions {
 	@IsArray()
 	@IsString({ each: true })
 	flags?: string[];
+
+	@IsOptional()
+	@IsNotEmpty()
+	@Transform(({ value }) => new Date(value))
+	@IsDate()
+	time?: Date;
+
+	@IsOptional()
+	@IsString()
+	place?: string;
+}
+
+export class ReadAllMeetupDto extends BaseReadAllDto {
+	@IsOptional()
+	@MaxLength(255)
+	@IsString()
+	title?: string;
+
+	@IsOptional()
+	@IsString()
+	discription?: string;
+
+	@IsOptional()
+	@IsDefined()
+	@IsArray()
+	@Type(() => Flag)
+	flags?: Flag[];
 
 	@IsOptional()
 	@IsNotEmpty()

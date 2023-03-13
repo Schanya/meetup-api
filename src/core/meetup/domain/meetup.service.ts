@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 import {
 	MeetupDto,
@@ -11,6 +11,8 @@ import { Meetup } from './meetup.entity';
 
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
+import { IReadAllMeetupOptions } from '../presentation/meetup.type';
+import { defaultPagination } from 'src/common/costans/pagination.constants';
 
 @Injectable()
 export class MeetupService {
@@ -19,10 +21,24 @@ export class MeetupService {
 		private flagService: FlagService,
 	) {}
 
-	public async findAll(options: MeetupOptions): Promise<Meetup[]> {
+	public async findAll(options: IReadAllMeetupOptions): Promise<Meetup[]> {
+		let { pagination, sorting, filter } = options;
+
+		pagination = pagination ?? defaultPagination;
+		sorting = sorting ?? { column: 'title', direction: 'ASC' };
+
+		let filterOptions = {};
+
+		Object.keys(filter).map((el, i) => {
+			filterOptions[el] = { [Op.like]: `%${Object.values(filter)[i]}%` };
+		});
+
 		const suitableMeetups = await this.meetupRepository.findAll({
-			where: { ...options },
+			where: { ...filterOptions },
 			include: { all: true },
+			limit: pagination.size,
+			offset: pagination.offset,
+			order: [[sorting.column, sorting.direction]],
 		});
 
 		return suitableMeetups;

@@ -1,4 +1,17 @@
+import { IPaginationOptions } from 'src/common/types/pagination-options';
+import { ISortingOptions } from 'src/common/types/sorting.options';
 import { Meetup } from '../domain/meetup.entity';
+
+export interface IReadAllMeetupOptions {
+	filter?: {
+		title?: string;
+		discription?: string;
+		time?: Date;
+		place?: string;
+	};
+	sorting?: ISortingOptions;
+	pagination?: IPaginationOptions;
+}
 
 export class FrontendMeetup {
 	public id: number;
