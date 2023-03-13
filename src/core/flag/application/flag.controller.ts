@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { FlagService } from '../domain/flag.service';
 import { FlagDto, FlagOptions } from '../presentation/flag.dto';
+import { FrontendFlag } from '../presentation/flag.type';
 
 @Controller('flag')
 export class FlagController {
@@ -21,7 +22,7 @@ export class FlagController {
 	async getAll() {
 		const flags = await this.flagService.findAll({});
 
-		return flags;
+		return flags.map((flag) => new FrontendFlag(flag));
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -29,15 +30,15 @@ export class FlagController {
 	async getOne(@Param('id') id: number) {
 		const flag = await this.flagService.findBy({ id: id });
 
-		return flag;
+		return new FrontendFlag(flag);
 	}
 
 	@HttpCode(HttpStatus.CREATED)
 	@Post()
 	async create(@Body() flagDto: FlagDto) {
-		const flag = await this.flagService.create(flagDto);
+		const createdFlag = await this.flagService.create(flagDto);
 
-		return `Flag ${flag.name} created successfully`;
+		return new FrontendFlag(createdFlag);
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -49,7 +50,7 @@ export class FlagController {
 	) {
 		const updatedFlag = await this.flagService.update(id, flagOptions);
 
-		return `Flag ${updatedFlag.name} updated successfully`;
+		return new FrontendFlag(updatedFlag);
 	}
 
 	@HttpCode(HttpStatus.OK)
