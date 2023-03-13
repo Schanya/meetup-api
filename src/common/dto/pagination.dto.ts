@@ -1,5 +1,5 @@
 import { IsInt, IsDefined, IsOptional, Min, Max } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 
 export class PaginationDto {
 	@IsOptional()
@@ -7,15 +7,14 @@ export class PaginationDto {
 	@IsInt()
 	@Min(1)
 	@Type(() => Number)
-	public page: number = 1;
-
+	public page: number;
 	@IsOptional()
 	@IsDefined()
 	@IsInt()
 	@Min(1)
 	@Max(50)
 	@Type(() => Number)
-	public size: number = 10;
+	public size: number;
 
 	get offset(): number {
 		return (this.page - 1) * this.size;

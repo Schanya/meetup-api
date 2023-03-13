@@ -1,4 +1,4 @@
-import { plainToClass, Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsObject, IsOptional, ValidateNested } from 'class-validator';
 import { PaginationDto } from './pagination.dto';
 import { SortingDto } from './sorting.dto';

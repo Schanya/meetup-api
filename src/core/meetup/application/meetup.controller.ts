@@ -13,8 +13,6 @@ import {
 } from '@nestjs/common';
 import { Transaction } from 'sequelize';
 import { TransactionParam } from 'src/common/decorators/transaction.decorator';
-import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
 
 import { MeetupService } from '../domain/meetup.service';

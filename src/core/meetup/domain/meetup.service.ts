@@ -5,19 +5,13 @@ import { Op, Transaction } from 'sequelize';
 import {
 	MeetupDto,
 	MeetupOptions,
-	ReadAllMeetupDto,
 	UpdateMeetupOptions,
 } from '../presentation/meetup.dto';
 import { Meetup } from './meetup.entity';
 
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
-import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import {
-	IReadAllMeetupOptions,
-	TestMeetupFilter,
-} from '../presentation/meetup.type';
+import { IReadAllMeetupOptions } from '../presentation/meetup.type';
 import { defaultPagination } from 'src/common/costans/pagination.constants';
 
 @Injectable()
@@ -27,25 +21,24 @@ export class MeetupService {
 		private flagService: FlagService,
 	) {}
 
-	public async findAll(
-		options: IReadAllMeetupOptions = { pagination: defaultPagination },
-	): Promise<Meetup[]> {
-		const { pagination, sorting, filter } = options;
+	public async findAll(options: IReadAllMeetupOptions): Promise<Meetup[]> {
+		let { pagination, sorting, filter } = options;
 
-		let arr = new Array<string>();
+		pagination = pagination ?? defaultPagination;
+		sorting = sorting ?? { column: 'title', direction: 'ASC' };
+
+		let filterOptions = {};
 
 		Object.keys(filter).map((el, i) => {
-			arr.push(`%${Object.values(filter)[i]}%`);
+			filterOptions[el] = { [Op.like]: `%${Object.values(filter)[i]}%` };
 		});
 
-		let test = new TestMeetupFilter(arr[0], arr[1]);
-
 		const suitableMeetups = await this.meetupRepository.findAll({
-			where: { ...test },
+			where: { ...filterOptions },
 			include: { all: true },
 			limit: pagination.size,
 			offset: pagination.offset,
-			order: [['title', 'DESC']],
+			order: [[sorting.column, sorting.direction]],
 		});
 
 		return suitableMeetups;
