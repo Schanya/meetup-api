@@ -1,16 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 import {
 	MeetupDto,
 	MeetupOptions,
+	ReadAllMeetupDto,
 	UpdateMeetupOptions,
 } from '../presentation/meetup.dto';
 import { Meetup } from './meetup.entity';
 
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
+import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import {
+	IReadAllMeetupOptions,
+	TestMeetupFilter,
+} from '../presentation/meetup.type';
+import { defaultPagination } from 'src/common/costans/pagination.constants';
 
 @Injectable()
 export class MeetupService {
@@ -19,10 +27,25 @@ export class MeetupService {
 		private flagService: FlagService,
 	) {}
 
-	public async findAll(options: MeetupOptions): Promise<Meetup[]> {
+	public async findAll(
+		options: IReadAllMeetupOptions = { pagination: defaultPagination },
+	): Promise<Meetup[]> {
+		const { pagination, sorting, filter } = options;
+
+		let arr = new Array<string>();
+
+		Object.keys(filter).map((el, i) => {
+			arr.push(`%${Object.values(filter)[i]}%`);
+		});
+
+		let test = new TestMeetupFilter(arr[0], arr[1]);
+
 		const suitableMeetups = await this.meetupRepository.findAll({
-			where: { ...options },
+			where: { ...test },
 			include: { all: true },
+			limit: pagination.size,
+			offset: pagination.offset,
+			order: [['title', 'DESC']],
 		});
 
 		return suitableMeetups;
