@@ -11,9 +11,13 @@ import { Meetup } from './meetup.entity';
 
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
-import { IReadAllMeetupOptions } from '../presentation/meetup.type';
+import {
+	IReadAllMeetupOptions,
+	MeetupFiltration,
+} from '../presentation/meetup.type';
 import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
+import { ReadAllResult } from 'src/common/types/read-all.options';
 
 @Injectable()
 export class MeetupService {
@@ -22,36 +26,32 @@ export class MeetupService {
 		private flagService: FlagService,
 	) {}
 
-	public async findAll(options: IReadAllMeetupOptions): Promise<Meetup[]> {
-		let { pagination, sorting, filter } = options;
+	public async findAll(
+		options: IReadAllMeetupOptions,
+	): Promise<ReadAllResult<Meetup>> {
+		const pagination = options.pagination ?? defaultPagination;
+		const sorting = options.sorting ?? defaultSorting;
+		const filter = MeetupFiltration.getLikeFilters(options.filter);
 
-		pagination = pagination ?? defaultPagination;
-		sorting = sorting ?? defaultSorting;
-
-		let filterOptions = {};
-		let test = {};
-
-		Object.keys(filter).map((el, i) => {
-			el == 'flags'
-				? (test['name'] = { [Op.like]: `%${Object.values(filter)[i]}%` })
-				: (filterOptions[el] = { [Op.like]: `%${Object.values(filter)[i]}%` });
-		});
-
-		const suitableMeetups = await this.meetupRepository.findAll({
-			where: { ...filterOptions },
+		const { count, rows } = await this.meetupRepository.findAndCountAll({
+			where: { ...filter.meetupFilters },
 			include: [
 				{
 					model: Flag,
-					where: { ...test },
+					where: filter.flagsFilters,
 					all: true,
 				},
 			],
+			distinct: true,
 			limit: pagination.size,
 			offset: pagination.offset,
 			order: [[sorting.column, sorting.direction]],
 		});
 
-		return suitableMeetups;
+		return {
+			totalRecordsNumber: count,
+			entities: rows,
+		};
 	}
 
 	public async findBy(options: MeetupOptions): Promise<Meetup> {

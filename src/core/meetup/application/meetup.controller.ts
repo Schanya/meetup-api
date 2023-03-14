@@ -14,6 +14,8 @@ import {
 import { Transaction } from 'sequelize';
 import { TransactionParam } from 'src/common/decorators/transaction.decorator';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
+import { ReadAllResult } from 'src/common/types/read-all.options';
+import { Meetup } from '../domain/meetup.entity';
 
 import { MeetupService } from '../domain/meetup.service';
 import {
@@ -31,7 +33,7 @@ export class MeetupController {
 	@Get()
 	async getAll(
 		@Query() readAllMeetupDto: ReadAllMeetupDto,
-	): Promise<FrontendMeetup[]> {
+	): Promise<ReadAllResult<FrontendMeetup>> {
 		const { pagination, sorting, ...filter } = readAllMeetupDto;
 
 		const meetups = await this.meetupService.findAll({
@@ -40,7 +42,12 @@ export class MeetupController {
 			filter,
 		});
 
-		return meetups.map((meetup) => new FrontendMeetup(meetup));
+		return {
+			totalRecordsNumber: meetups.totalRecordsNumber,
+			entities: meetups.entities.map(
+				(meetup: Meetup) => new FrontendMeetup(meetup),
+			),
+		};
 	}
 
 	@HttpCode(HttpStatus.OK)

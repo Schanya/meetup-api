@@ -8,9 +8,12 @@ import {
 	Param,
 	Post,
 	Put,
+	Query,
 } from '@nestjs/common';
+import { ReadAllResult } from 'src/common/types/read-all.options';
+import { Flag } from '../domain/flag.entity';
 import { FlagService } from '../domain/flag.service';
-import { FlagDto, FlagOptions } from '../presentation/flag.dto';
+import { FlagDto, FlagOptions, ReadAllFlagDto } from '../presentation/flag.dto';
 import { FrontendFlag } from '../presentation/flag.type';
 
 @Controller('flag')
@@ -19,10 +22,21 @@ export class FlagController {
 
 	@HttpCode(HttpStatus.OK)
 	@Get()
-	async getAll() {
-		const flags = await this.flagService.findAll({});
+	async getAll(
+		@Query() readAllFlagDto: ReadAllFlagDto,
+	): Promise<ReadAllResult<FrontendFlag>> {
+		const { pagination, sorting, ...filter } = readAllFlagDto;
 
-		return flags.map((flag) => new FrontendFlag(flag));
+		const flags = await this.flagService.findAll({
+			pagination,
+			sorting,
+			filter,
+		});
+
+		return {
+			totalRecordsNumber: flags.totalRecordsNumber,
+			entities: flags.entities.map((meetup: Flag) => new FrontendFlag(meetup)),
+		};
 	}
 
 	@HttpCode(HttpStatus.OK)
