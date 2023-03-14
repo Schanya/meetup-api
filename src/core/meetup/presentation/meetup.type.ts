@@ -8,6 +8,7 @@ export interface IReadAllMeetupOptions {
 		discription?: string;
 		time?: Date;
 		place?: string;
+		flags?: string[];
 	};
 	sorting?: ISortingOptions;
 	pagination?: IPaginationOptions;

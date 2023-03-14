@@ -12,7 +12,8 @@ import { Meetup } from './meetup.entity';
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
 import { IReadAllMeetupOptions } from '../presentation/meetup.type';
-import { defaultPagination } from 'src/common/costans/pagination.constants';
+import { defaultPagination } from 'src/common/constants/pagination.constants';
+import { defaultSorting } from 'src/common/constants/sorting.constants';
 
 @Injectable()
 export class MeetupService {
@@ -25,17 +26,26 @@ export class MeetupService {
 		let { pagination, sorting, filter } = options;
 
 		pagination = pagination ?? defaultPagination;
-		sorting = sorting ?? { column: 'title', direction: 'ASC' };
+		sorting = sorting ?? defaultSorting;
 
 		let filterOptions = {};
+		let test = {};
 
 		Object.keys(filter).map((el, i) => {
-			filterOptions[el] = { [Op.like]: `%${Object.values(filter)[i]}%` };
+			el == 'flags'
+				? (test['name'] = { [Op.like]: `%${Object.values(filter)[i]}%` })
+				: (filterOptions[el] = { [Op.like]: `%${Object.values(filter)[i]}%` });
 		});
 
 		const suitableMeetups = await this.meetupRepository.findAll({
 			where: { ...filterOptions },
-			include: { all: true },
+			include: [
+				{
+					model: Flag,
+					where: { ...test },
+					all: true,
+				},
+			],
 			limit: pagination.size,
 			offset: pagination.offset,
 			order: [[sorting.column, sorting.direction]],

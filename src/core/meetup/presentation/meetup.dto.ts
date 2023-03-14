@@ -80,8 +80,7 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
 	@IsOptional()
 	@IsDefined()
 	@IsArray()
-	@Type(() => Flag)
-	flags?: Flag[];
+	flags?: string[];
 
 	@IsOptional()
 	@IsNotEmpty()
