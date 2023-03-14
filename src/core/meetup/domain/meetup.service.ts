@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 import {
 	MeetupDto,
@@ -11,6 +11,13 @@ import { Meetup } from './meetup.entity';
 
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
+import {
+	IReadAllMeetupOptions,
+	MeetupFiltration,
+} from '../presentation/meetup.type';
+import { defaultPagination } from 'src/common/constants/pagination.constants';
+import { defaultSorting } from 'src/common/constants/sorting.constants';
+import { ReadAllResult } from 'src/common/types/read-all.options';
 
 @Injectable()
 export class MeetupService {
@@ -19,13 +26,32 @@ export class MeetupService {
 		private flagService: FlagService,
 	) {}
 
-	public async findAll(options: MeetupOptions): Promise<Meetup[]> {
-		const suitableMeetups = await this.meetupRepository.findAll({
-			where: { ...options },
-			include: { all: true },
+	public async findAll(
+		options: IReadAllMeetupOptions,
+	): Promise<ReadAllResult<Meetup>> {
+		const pagination = options.pagination ?? defaultPagination;
+		const sorting = options.sorting ?? defaultSorting;
+		const filter = MeetupFiltration.getLikeFilters(options.filter);
+
+		const { count, rows } = await this.meetupRepository.findAndCountAll({
+			where: { ...filter.meetupFilters },
+			include: [
+				{
+					model: Flag,
+					where: filter.flagsFilters,
+					all: true,
+				},
+			],
+			distinct: true,
+			limit: pagination.size,
+			offset: pagination.offset,
+			order: [[sorting.column, sorting.direction]],
 		});
 
-		return suitableMeetups;
+		return {
+			totalRecordsNumber: count,
+			entities: rows,
+		};
 	}
 
 	public async findBy(options: MeetupOptions): Promise<Meetup> {
