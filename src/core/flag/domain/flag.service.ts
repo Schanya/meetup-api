@@ -1,11 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+
 import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
+
 import { ReadAllResult } from 'src/common/types/read-all.options';
-import { FlagDto, FlagOptions } from '../presentation/flag.dto';
-import { FlagFiltration, IReadAllFlagOptions } from '../presentation/flag.type';
+
+import { CreateFlagDto } from '../presentation/dto/create-flag.dto';
+import { FlagOptions } from '../presentation/dto/find-flag.options';
+
+import { IReadAllFlagOptions } from '../infrastructure/read-all-flag-interface';
+
 import { Flag } from './flag.entity';
+import { FlagFiltration } from './flag.filter';
 
 @Injectable()
 export class FlagService {
@@ -42,14 +49,14 @@ export class FlagService {
 		return suitableFlag;
 	}
 
-	public async create(flagDto: FlagDto): Promise<Flag> {
-		const existingFlag = await this.findBy({ name: flagDto.name });
+	public async create(createFlagDto: CreateFlagDto): Promise<Flag> {
+		const existingFlag = await this.findBy({ name: createFlagDto.name });
 
 		if (existingFlag) {
 			throw new BadRequestException('Such flag has already exist');
 		}
 
-		return await this.flagRepository.create(flagDto);
+		return await this.flagRepository.create(createFlagDto);
 	}
 
 	public async update(id: number, flagOptions: FlagOptions): Promise<Flag> {

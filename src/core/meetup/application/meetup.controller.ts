@@ -14,16 +14,17 @@ import {
 import { Transaction } from 'sequelize';
 import { TransactionParam } from 'src/common/decorators/transaction.decorator';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
-import { ReadAllResult } from 'src/common/types/read-all.options';
-import { Meetup } from '../domain/meetup.entity';
 
+import { ReadAllResult } from 'src/common/types/read-all.options';
+
+import { Meetup } from '../domain/meetup.entity';
 import { MeetupService } from '../domain/meetup.service';
-import {
-	MeetupDto,
-	MeetupOptions,
-	ReadAllMeetupDto,
-} from '../presentation/meetup.dto';
-import { FrontendMeetup } from '../presentation/meetup.type';
+import { FrontendMeetup } from '../presentation/types/meetup.type';
+
+import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
+import { ReadAllMeetupDto } from '../presentation/dto/read-all-meetup.dto';
+import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
+import { MeetupOptions } from '../presentation/dto/find-meetup.options';
 
 @Controller('meetup')
 export class MeetupController {
@@ -62,10 +63,13 @@ export class MeetupController {
 	@HttpCode(HttpStatus.CREATED)
 	@Post()
 	async create(
-		@Body() meetupDto: MeetupDto,
+		@Body() createMeetupDto: CreateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
-		const meetup = await this.meetupService.create(meetupDto, transaction);
+		const meetup = await this.meetupService.create(
+			createMeetupDto,
+			transaction,
+		);
 
 		return new FrontendMeetup(meetup);
 	}
@@ -76,12 +80,12 @@ export class MeetupController {
 	async update(
 		@Param('id')
 		id: number,
-		@Body() meetupOptions: MeetupOptions,
+		@Body() updateMeetupDto: MeetupOptions,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const updatedMeetup = await this.meetupService.update(
 			id,
-			meetupOptions,
+			updateMeetupDto,
 			transaction,
 		);
 
