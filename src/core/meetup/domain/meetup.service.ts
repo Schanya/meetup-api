@@ -1,23 +1,23 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op, Transaction } from 'sequelize';
+import { Transaction } from 'sequelize';
 
-import {
-	MeetupDto,
-	MeetupOptions,
-	UpdateMeetupOptions,
-} from '../presentation/meetup.dto';
 import { Meetup } from './meetup.entity';
 
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
-import {
-	IReadAllMeetupOptions,
-	MeetupFiltration,
-} from '../presentation/meetup.type';
+
 import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
+
 import { ReadAllResult } from 'src/common/types/read-all.options';
+import { IReadAllMeetupOptions } from '../infrastructure/read-all-meetup.interface';
+
+import { MeetupFiltration } from './meetup.filter';
+
+import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
+import { MeetupOptions } from '../presentation/dto/find-meetup.options';
+import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
 
 @Injectable()
 export class MeetupService {
@@ -88,14 +88,14 @@ export class MeetupService {
 	}
 
 	public async create(
-		meetupDto: MeetupDto,
+		createMeetupDto: CreateMeetupDto,
 		transaction: Transaction,
 	): Promise<Meetup> {
-		const resultFlags = await this.flagArrayHandler(meetupDto.flags);
+		const resultFlags = await this.flagArrayHandler(createMeetupDto.flags);
 
-		const { flags, ...rest } = meetupDto;
+		const { flags, ...rest } = createMeetupDto;
 
-		const createdMeetup = await this.meetupRepository.create(meetupDto, {
+		const createdMeetup = await this.meetupRepository.create(createMeetupDto, {
 			transaction,
 		});
 
@@ -121,11 +121,11 @@ export class MeetupService {
 			throw new BadRequestException("Such meetup doesn't exist");
 		}
 
-		const updateMeetupOptions: UpdateMeetupOptions = {
+		const updateMeetupDto: UpdateMeetupDto = {
 			...meetupOptions,
 		};
 
-		await this.meetupRepository.update(updateMeetupOptions, {
+		await this.meetupRepository.update(updateMeetupDto, {
 			where: { id },
 			transaction,
 		});

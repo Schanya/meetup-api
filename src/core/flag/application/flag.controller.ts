@@ -13,8 +13,11 @@ import {
 import { ReadAllResult } from 'src/common/types/read-all.options';
 import { Flag } from '../domain/flag.entity';
 import { FlagService } from '../domain/flag.service';
-import { FlagDto, FlagOptions, ReadAllFlagDto } from '../presentation/flag.dto';
-import { FrontendFlag } from '../presentation/flag.type';
+import { CreateFlagDto } from '../presentation/dto/create-flag.dto';
+import { FlagOptions } from '../presentation/dto/find-flag.options';
+import { ReadAllFlagDto } from '../presentation/dto/read-all-flag.dto';
+
+import { FrontendFlag } from '../presentation/types/flag.type';
 
 @Controller('flag')
 export class FlagController {
@@ -49,8 +52,8 @@ export class FlagController {
 
 	@HttpCode(HttpStatus.CREATED)
 	@Post()
-	async create(@Body() flagDto: FlagDto) {
-		const createdFlag = await this.flagService.create(flagDto);
+	async create(@Body() createFlagDto: CreateFlagDto) {
+		const createdFlag = await this.flagService.create(createFlagDto);
 
 		return new FrontendFlag(createdFlag);
 	}
