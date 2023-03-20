@@ -22,8 +22,8 @@ import { MeetupService } from '../domain/meetup.service';
 import { FrontendMeetup } from '../presentation/types/meetup.type';
 
 import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
-import { MeetupOptions } from '../presentation/dto/find-meetup.options';
 import { ReadAllMeetupDto } from '../presentation/dto/read-all-meetup.dto';
+import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
 
 @Controller('meetup')
 export class MeetupController {
@@ -79,7 +79,7 @@ export class MeetupController {
 	async update(
 		@Param('id')
 		id: number,
-		@Body() updateMeetupDto: MeetupOptions,
+		@Body() updateMeetupDto: UpdateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const updatedMeetup = await this.meetupService.update(
