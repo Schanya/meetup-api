@@ -38,8 +38,8 @@ export class MeetupService {
 			include: [
 				{
 					model: Flag,
-					where: filter.flagsFilters,
 					all: true,
+					where: filter.flagsFilters,
 				},
 			],
 			distinct: true,
@@ -47,6 +47,10 @@ export class MeetupService {
 			offset: pagination.offset,
 			order: [[sorting.column, sorting.direction]],
 		});
+
+		for (let i = 0; i < rows.length; i++) {
+			rows[i].flags = await rows[i].$get('flags');
+		}
 
 		return {
 			totalRecordsNumber: count,
@@ -112,7 +116,7 @@ export class MeetupService {
 
 	public async update(
 		id: number,
-		meetupOptions: MeetupOptions,
+		updateMeetupDto: UpdateMeetupDto,
 		transaction: Transaction,
 	): Promise<Meetup> {
 		const existingMeetup = await this.findBy({ id: id });
@@ -121,24 +125,23 @@ export class MeetupService {
 			throw new BadRequestException("Such meetup doesn't exist");
 		}
 
-		const updateMeetupDto: UpdateMeetupDto = {
-			...meetupOptions,
-		};
+		const { flags, ...meetupUpdateOptions } = updateMeetupDto;
 
-		await this.meetupRepository.update(updateMeetupDto, {
+		await this.meetupRepository.update(meetupUpdateOptions, {
 			where: { id },
 			transaction,
+			returning: true,
 		});
 
 		const existingFlags: Flag[] = await existingMeetup.$get('flags');
 		await existingMeetup.$remove('flags', existingFlags, { transaction });
 
-		const resultFlags = await this.flagArrayHandler(meetupOptions.flags);
+		const resultFlags = await this.flagArrayHandler(flags);
 		await existingMeetup.$add('flags', resultFlags, { transaction });
 
-		existingMeetup.flags = resultFlags;
+		const updatedMeetup = await this.findBy({ id });
 
-		return existingMeetup;
+		return updatedMeetup;
 	}
 
 	public async delete(id: number, transaction: Transaction): Promise<number> {

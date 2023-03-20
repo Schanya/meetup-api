@@ -20,6 +20,12 @@ export class UpdateMeetupDto {
 	discription?: string;
 
 	@IsOptional()
+	@IsDefined()
+	@IsArray()
+	@IsString({ each: true })
+	flags?: string[];
+
+	@IsOptional()
 	@IsNotEmpty()
 	@Transform(({ value }) => new Date(value))
 	@IsDate()
