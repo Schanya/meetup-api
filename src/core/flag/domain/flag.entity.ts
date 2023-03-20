@@ -7,10 +7,7 @@ import {
 } from 'sequelize-typescript';
 
 import { Meetup } from 'src/core/meetup/domain/meetup.entity';
-
-interface FlagCreationAttrs {
-	name: string;
-}
+import { FlagCreationAttrs } from '../infrastructure/flag.interface';
 
 @Table({ tableName: 'flags', paranoid: true })
 export class Flag extends Model<Flag, FlagCreationAttrs> {
