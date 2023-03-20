@@ -9,7 +9,7 @@ import { ReadAllResult } from 'src/common/types/read-all.options';
 import { CreateFlagDto } from '../presentation/dto/create-flag.dto';
 import { FlagOptions } from '../presentation/dto/find-flag.options';
 
-import { IReadAllFlagOptions } from '../infrastructure/read-all-flag-interface';
+import { IReadAllFlagOptions } from '../infrastructure/read-all-flag.interface';
 
 import { Flag } from './flag.entity';
 import { FlagFiltration } from './flag.filter';
