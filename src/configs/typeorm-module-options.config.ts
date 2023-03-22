@@ -2,11 +2,11 @@ import { SequelizeModuleOptions } from '@nestjs/sequelize';
 
 const dbconfig: SequelizeModuleOptions = {
 	dialect: 'postgres',
-	host: process.env.POSTGRES_DB_HOST || 'localhost',
-	port: Number.parseInt(process.env.POSTGRES_DB_PORT || '5432', 10),
-	username: process.env.POSTGRES_DB_USERNAME || 'postgres',
-	password: process.env.POSTGRES_DB_PASSWORD || 'SCH08',
-	database: process.env.POSTGRES_DB_NAME || 'meetup_db',
+	host: process.env.POSTGRES_DB_HOST,
+	port: Number.parseInt(process.env.POSTGRES_DB_PORT, 10),
+	username: process.env.POSTGRES_DB_USERNAME,
+	password: process.env.POSTGRES_DB_PASSWORD,
+	database: process.env.POSTGRES_DB_NAME,
 	models: [],
 	autoLoadModels: true,
 	synchronize: true,
