@@ -1,6 +1,6 @@
 export interface MeetupCreationAttrs {
 	title: string;
-	discroption: string;
+	description: string;
 	time: Date;
 	place: string;
 }

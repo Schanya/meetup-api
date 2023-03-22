@@ -14,7 +14,7 @@ export class FrontendMeetup {
 	constructor(meetup: Meetup) {
 		this.id = meetup.id;
 		this.title = meetup.title;
-		this.description = meetup.discription;
+		this.description = meetup.description;
 		this.time = meetup.time;
 		this.place = meetup.place;
 		this.flags = meetup.flags.map((flag) => ({
