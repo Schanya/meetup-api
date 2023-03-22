@@ -22,7 +22,7 @@ export class MeetupOptions {
 
 	@IsOptional()
 	@IsString()
-	discription?: string;
+	description?: string;
 
 	@IsOptional()
 	@IsDefined()

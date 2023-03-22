@@ -17,7 +17,7 @@ export class UpdateMeetupDto {
 
 	@IsOptional()
 	@IsString()
-	discription?: string;
+	description?: string;
 
 	@IsOptional()
 	@IsDefined()

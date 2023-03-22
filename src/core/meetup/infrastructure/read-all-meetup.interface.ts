@@ -4,7 +4,7 @@ import { ISortingOptions } from 'src/common/types/sorting.options';
 export interface IReadAllMeetupOptions {
 	filter?: {
 		title?: string;
-		discription?: string;
+		description?: string;
 		time?: Date;
 		place?: string;
 		flags?: string[];

@@ -22,7 +22,7 @@ export class Meetup extends Model<Meetup, MeetupCreationAttrs> {
 	title: string;
 
 	@Column({ type: DataType.STRING })
-	discription: string;
+	description: string;
 
 	@Column({ type: DataType.DATE, allowNull: false })
 	time: Date;

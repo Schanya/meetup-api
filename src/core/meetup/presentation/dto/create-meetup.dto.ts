@@ -15,7 +15,7 @@ export class CreateMeetupDto {
 	title: string;
 
 	@IsString()
-	discription?: string;
+	description?: string;
 
 	@IsDefined()
 	@IsArray()

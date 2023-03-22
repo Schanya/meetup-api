@@ -18,7 +18,7 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
 
 	@IsOptional()
 	@IsString()
-	discription?: string;
+	description?: string;
 
 	@IsOptional()
 	@IsDefined()
