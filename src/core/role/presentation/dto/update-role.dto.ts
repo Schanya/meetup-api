@@ -1,6 +1,6 @@
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class UpdateMeetupDto {
+export class UpdateRoleDto {
 	@IsOptional()
 	@MaxLength(255)
 	@IsString()

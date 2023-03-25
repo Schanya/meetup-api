@@ -1,6 +1,6 @@
 import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class MeetupOptions {
+export class RoleOptions {
 	@IsOptional()
 	@IsInt()
 	id?: number;
