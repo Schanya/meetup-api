@@ -2,9 +2,11 @@ import {
 	BelongsToMany,
 	Column,
 	DataType,
+	HasMany,
 	Model,
 	Table,
 } from 'sequelize-typescript';
+import { Meetup } from 'src/core/meetup/domain/meetup.entity';
 import { Role } from 'src/core/role/domain/role.entity';
 import { UserCreationAttrs } from '../infrastructure/user.interface';
 
@@ -26,4 +28,7 @@ export class User extends Model<User, UserCreationAttrs> {
 
 	@BelongsToMany(() => Role, 'users_roles', 'user_id', 'role_id')
 	roles: Role[];
+
+	@HasMany(() => Meetup)
+	meetups: Meetup[];
 }
