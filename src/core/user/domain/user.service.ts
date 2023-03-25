@@ -4,6 +4,7 @@ import { Transaction } from 'sequelize';
 import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
 import { ReadAllResult } from 'src/common/types/read-all.options';
+import { Role } from 'src/core/role/domain/role.entity';
 import { IReadAllUserOptions } from '../infrastructure/read-all-user.interface';
 import { CreateUserDto } from '../presentation/dto/create-user.dto';
 import { UserOptions } from '../presentation/dto/find-user.options';
@@ -24,11 +25,22 @@ export class UserService {
 
 		const { count, rows } = await this.userRepository.findAndCountAll({
 			where: { ...filter.usersFilters },
+			include: [
+				{
+					model: Role,
+					all: true,
+					where: filter.rolesFilters,
+				},
+			],
 			distinct: true,
 			limit: pagination.size,
 			offset: pagination.offset,
 			order: [[sorting.column, sorting.direction]],
 		});
+
+		for (let i = 0; i < rows.length; i++) {
+			rows[i].roles = await rows[i].$get('roles');
+		}
 
 		return {
 			totalRecordsNumber: count,
@@ -53,6 +65,12 @@ export class UserService {
 		createUserDto: CreateUserDto,
 		transaction: Transaction,
 	): Promise<User> {
+		const existingUser = await this.findBy({ email: createUserDto.email });
+
+		if (existingUser) {
+			throw new BadRequestException('Such user already exists');
+		}
+
 		const createdUser = await this.userRepository.create(createUserDto, {
 			transaction,
 		});
@@ -71,6 +89,12 @@ export class UserService {
 
 		if (!existingUser) {
 			throw new BadRequestException("Such user doesn't exist");
+		}
+
+		const sameUser = await this.findBy({ email: updateUserDto.email });
+
+		if (sameUser) {
+			throw new BadRequestException('Such user already exists');
 		}
 
 		await this.userRepository.update(updateUserDto, {
