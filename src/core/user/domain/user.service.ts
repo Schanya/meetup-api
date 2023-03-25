@@ -54,10 +54,6 @@ export class UserService {
 			include: { all: true },
 		});
 
-		if (!suitableUser) {
-			throw new BadRequestException("There isn't suitable user");
-		}
-
 		return suitableUser;
 	}
 
