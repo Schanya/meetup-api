@@ -20,6 +20,16 @@ export class UserService {
 		private roleService: RoleService,
 	) {}
 
+	public async findOne(options: UserOptions): Promise<User> {
+		const suitableUser = await this.findBy({ ...options });
+
+		if (!suitableUser) {
+			throw new BadRequestException("There isn't suitable user");
+		}
+
+		return suitableUser;
+	}
+
 	public async findAll(
 		options: IReadAllUserOptions,
 	): Promise<ReadAllResult<User>> {
@@ -100,18 +110,19 @@ export class UserService {
 			throw new BadRequestException('Such user already exists');
 		}
 
-		await this.userRepository.update(updateUserDto, {
-			where: { id },
-			transaction,
-			returning: true,
-		});
+		const [numberUpdatedRows, updatedUsers] = await this.userRepository.update(
+			updateUserDto,
+			{
+				where: { id },
+				transaction,
+				returning: true,
+			},
+		);
 
-		const updatedMeetup = await this.findBy({ id });
-
-		return updatedMeetup;
+		return updatedUsers[0];
 	}
 
-	public async delete(id: number, transaction: Transaction): Promise<number> {
+	public async delete(id: number, transaction: Transaction): Promise<void> {
 		const numberDeletedRows = await this.userRepository.destroy({
 			where: { id },
 			transaction,
@@ -119,7 +130,5 @@ export class UserService {
 
 		if (!numberDeletedRows)
 			throw new BadRequestException('There is no suitable user');
-
-		return numberDeletedRows;
 	}
 }
