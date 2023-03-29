@@ -59,7 +59,7 @@ export class MeetupController {
 	@HttpCode(HttpStatus.OK)
 	@Get(':id')
 	async getOne(@Param('id') id: number) {
-		const meetup = await this.meetupService.findBy({ id: id });
+		const meetup = await this.meetupService.findOne({ id: id });
 
 		return new FrontendMeetup(meetup);
 	}
@@ -102,14 +102,12 @@ export class MeetupController {
 	}
 
 	@UseInterceptors(TransactionInterceptor)
-	@HttpCode(HttpStatus.OK)
+	@HttpCode(HttpStatus.NO_CONTENT)
 	@Delete(':id')
 	async delete(
 		@Param('id') id: number,
 		@TransactionParam() transaction: Transaction,
 	) {
 		await this.meetupService.delete(id, transaction);
-
-		return `Meetup deleted successfully`;
 	}
 }
