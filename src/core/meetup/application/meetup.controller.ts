@@ -1,4 +1,5 @@
 import {
+	Request,
 	Body,
 	Controller,
 	Delete,
@@ -9,6 +10,7 @@ import {
 	Post,
 	Put,
 	Query,
+	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
 import { Transaction } from 'sequelize';
@@ -24,6 +26,10 @@ import { FrontendMeetup } from '../presentation/types/meetup.type';
 import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
 import { ReadAllMeetupDto } from '../presentation/dto/read-all-meetup.dto';
 import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
+
+import { Roles } from 'src/common/interseptors/role.decorator';
+import { JwtAuthGuard } from 'src/core/auth/guards/jwt.guard';
+import { RolesGuard } from 'src/core/auth/guards/role.guard';
 
 @Controller('meetup')
 export class MeetupController {
@@ -58,16 +64,20 @@ export class MeetupController {
 		return new FrontendMeetup(meetup);
 	}
 
+	@Roles('ADMIN', 'USER', 'TEST')
+	@UseGuards(JwtAuthGuard, RolesGuard)
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
 	@Post()
 	async create(
+		@Request() req,
 		@Body() createMeetupDto: CreateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const meetup = await this.meetupService.create(
 			createMeetupDto,
 			transaction,
+			req.user.id,
 		);
 
 		return new FrontendMeetup(meetup);

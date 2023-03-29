@@ -5,6 +5,7 @@ import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
 import { ReadAllResult } from 'src/common/types/read-all.options';
 import { Role } from 'src/core/role/domain/role.entity';
+import { RoleService } from 'src/core/role/domain/role.service';
 import { IReadAllUserOptions } from '../infrastructure/read-all-user.interface';
 import { CreateUserDto } from '../presentation/dto/create-user.dto';
 import { UserOptions } from '../presentation/dto/find-user.options';
@@ -14,7 +15,10 @@ import { UserFiltration } from './user.filter';
 
 @Injectable()
 export class UserService {
-	constructor(@InjectModel(User) private userRepository: typeof User) {}
+	constructor(
+		@InjectModel(User) private userRepository: typeof User,
+		private roleService: RoleService,
+	) {}
 
 	public async findAll(
 		options: IReadAllUserOptions,
@@ -70,6 +74,9 @@ export class UserService {
 		const createdUser = await this.userRepository.create(createUserDto, {
 			transaction,
 		});
+
+		const role = await this.roleService.findBy({ name: 'TEST' });
+		await createdUser.$add('role', role, { transaction });
 
 		await createdUser.save({ transaction });
 
