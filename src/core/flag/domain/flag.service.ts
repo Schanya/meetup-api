@@ -18,6 +18,16 @@ import { FlagFiltration } from './flag.filter';
 export class FlagService {
 	constructor(@InjectModel(Flag) private flagRepository: typeof Flag) {}
 
+	public async findOne(options: FlagOptions): Promise<Flag> {
+		const suitableFlag = await this.findBy({ ...options });
+
+		if (!suitableFlag) {
+			throw new BadRequestException("There isn't suitable flag");
+		}
+
+		return suitableFlag;
+	}
+
 	public async findAll(
 		options: IReadAllFlagOptions,
 	): Promise<ReadAllResult<Flag>> {
@@ -63,30 +73,32 @@ export class FlagService {
 		const existingFlag = await this.findBy({ id: id });
 
 		if (!existingFlag) {
-			throw new BadRequestException("Such meetup doesn't exist");
+			throw new BadRequestException("Such flag doesn't exist");
 		}
 
 		const sameFlag = await this.findBy({ name: flagOptions.name });
 
 		if (sameFlag) {
-			throw new BadRequestException('Such meetup already exists');
+			throw new BadRequestException('Such flag already exists');
 		}
 
-		await this.flagRepository.update(flagOptions, { where: { id } });
+		const [numberUpdatedRows, updatedFlags] = await this.flagRepository.update(
+			flagOptions,
+			{
+				where: { id },
+				returning: true,
+			},
+		);
 
-		const updatedFlag = await this.findBy({ id: id });
-
-		return updatedFlag;
+		return updatedFlags[0];
 	}
 
-	public async delete(id: number): Promise<number> {
+	public async delete(id: number): Promise<void> {
 		const numberDeletedRows = await this.flagRepository.destroy({
 			where: { id },
 		});
 
 		if (!numberDeletedRows)
-			throw new BadRequestException('There is no suitable meetup');
-
-		return numberDeletedRows;
+			throw new BadRequestException('There is no suitable flag');
 	}
 }
