@@ -44,7 +44,7 @@ export class RoleController {
 	@HttpCode(HttpStatus.OK)
 	@Get(':id')
 	async getOne(@Param('id') id: number) {
-		const role = await this.roleService.findBy({ id: id });
+		const role = await this.roleService.findOne({ id: id });
 
 		return new FrontendRole(role);
 	}
@@ -69,11 +69,9 @@ export class RoleController {
 		return new FrontendRole(updatedRole);
 	}
 
-	@HttpCode(HttpStatus.OK)
+	@HttpCode(HttpStatus.NO_CONTENT)
 	@Delete(':id')
 	async delete(@Param('id') id: number) {
 		await this.roleService.delete(id);
-
-		return `Role deleted successfully`;
 	}
 }

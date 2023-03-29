@@ -14,6 +14,16 @@ import { RoleFiltration } from './role.filter';
 export class RoleService {
 	constructor(@InjectModel(Role) private roleRepository: typeof Role) {}
 
+	public async findOne(options: RoleOptions): Promise<Role> {
+		const suitableRole = await this.findBy({ ...options });
+
+		if (!suitableRole) {
+			throw new BadRequestException("There isn't suitable role");
+		}
+
+		return suitableRole;
+	}
+
 	public async findAll(
 		options: IReadAllRoleOptions,
 	): Promise<ReadAllResult<Role>> {
@@ -68,21 +78,23 @@ export class RoleService {
 			throw new BadRequestException('Such role already exists');
 		}
 
-		await this.roleRepository.update(UpdateRoleDto, { where: { id } });
+		const [numberUpdatedRows, updatedRoles] = await this.roleRepository.update(
+			UpdateRoleDto,
+			{
+				where: { id },
+				returning: true,
+			},
+		);
 
-		const updatedRole = await this.findBy({ id: id });
-
-		return updatedRole;
+		return updatedRoles[0];
 	}
 
-	public async delete(id: number): Promise<number> {
+	public async delete(id: number): Promise<void> {
 		const numberDeletedRows = await this.roleRepository.destroy({
 			where: { id },
 		});
 
 		if (!numberDeletedRows)
 			throw new BadRequestException('There is no suitable role');
-
-		return numberDeletedRows;
 	}
 }
