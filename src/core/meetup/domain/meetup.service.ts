@@ -94,14 +94,18 @@ export class MeetupService {
 	public async create(
 		createMeetupDto: CreateMeetupDto,
 		transaction: Transaction,
+		userId: number,
 	): Promise<Meetup> {
 		const resultFlags = await this.flagArrayHandler(createMeetupDto.flags);
 
 		const { flags, ...rest } = createMeetupDto;
 
-		const createdMeetup = await this.meetupRepository.create(createMeetupDto, {
-			transaction,
-		});
+		const createdMeetup = await this.meetupRepository.create(
+			{ ...createMeetupDto, userId: userId },
+			{
+				transaction,
+			},
+		);
 
 		for await (const flag of resultFlags) {
 			await createdMeetup.$add('flags', flag, { transaction });
