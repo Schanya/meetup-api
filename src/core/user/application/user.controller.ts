@@ -48,7 +48,7 @@ export class UserController {
 	@HttpCode(HttpStatus.OK)
 	@Get(':id')
 	async getOne(@Param('id') id: number) {
-		const user = await this.userService.findBy({ id: id });
+		const user = await this.userService.findOne({ id: id });
 
 		return new FrontendUser(user);
 	}
@@ -84,14 +84,12 @@ export class UserController {
 	}
 
 	@UseInterceptors(TransactionInterceptor)
-	@HttpCode(HttpStatus.OK)
+	@HttpCode(HttpStatus.NO_CONTENT)
 	@Delete(':id')
 	async delete(
 		@Param('id') id: number,
 		@TransactionParam() transaction: Transaction,
 	) {
 		await this.userService.delete(id, transaction);
-
-		return `User deleted successfully`;
 	}
 }
