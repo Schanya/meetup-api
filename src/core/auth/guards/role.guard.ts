@@ -6,13 +6,12 @@ import {
 	Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { ROLES_KEY } from 'src/common/interseptors/role.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-	constructor(private jwtService: JwtService, private reflector: Reflector) {}
+	constructor(private reflector: Reflector) {}
 
 	canActivate(
 		context: ExecutionContext,

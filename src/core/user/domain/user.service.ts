@@ -65,7 +65,11 @@ export class UserService {
 	public async findBy(options: UserOptions): Promise<User> {
 		const suitableUser = await this.userRepository.findOne({
 			where: { ...options },
-			include: { all: true },
+			include: [
+				{
+					model: Role,
+				},
+			],
 		});
 
 		return suitableUser;

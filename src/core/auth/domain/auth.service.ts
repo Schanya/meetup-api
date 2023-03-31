@@ -1,8 +1,10 @@
 import {
+	BadRequestException,
 	HttpException,
 	HttpStatus,
 	Injectable,
 	NotFoundException,
+	UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Transaction } from 'sequelize';
@@ -60,19 +62,53 @@ export class AuthService {
 
 	async login(createUserDto: CreateUserDto) {
 		const user = await this.validateUser(createUserDto);
-		const token = this.generateToken(user);
+		const accessToken = await this.generateAccessToken(user);
+		const refreshToken = await this.generateRefreshToken(user);
 
-		return token;
+		return {
+			accessToken,
+			refreshToken,
+		};
 	}
 
-	private async generateToken(user: User) {
+	public async refresh(payload) {
+		try {
+			const newAccessToken = await this.generateAccessToken(payload);
+			const newRefreshToken = await this.generateRefreshToken(payload);
+
+			return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+		} catch (err) {
+			if (err.name === 'TokenExpiredError') {
+				throw new UnauthorizedException('refresh token expired');
+			} else {
+				throw new BadRequestException('refresh token is invalid');
+			}
+		}
+	}
+
+	private async generateAccessToken(user: User) {
 		const payload = {
 			id: user.id,
 			email: user.email,
 			roles: user.roles.map((role) => role.name),
 		};
-		return {
-			token: this.jwtService.sign(payload),
+
+		return await this.jwtService.signAsync(payload, {
+			secret: process.env.ACCESS_TOKEN_SECRET,
+			expiresIn: process.env.ACCESS_TOKEN_EXPIRED,
+		});
+	}
+
+	private async generateRefreshToken(user: User) {
+		const payload = {
+			id: user.id,
+			email: user.email,
+			roles: user.roles.map((role) => role.name),
 		};
+
+		return await this.jwtService.signAsync(payload, {
+			secret: process.env.REFRESH_TOKEN_SECRET,
+			expiresIn: process.env.REFRESH_TOKEN_EXPIRED,
+		});
 	}
 }

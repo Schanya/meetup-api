@@ -17,10 +17,6 @@ import { UserService } from './domain/user.service';
 		TransactionInterceptor,
 		{ provide: 'SEQUELIZE', useExisting: Sequelize },
 	],
-	exports: [
-		UserService,
-		TransactionInterceptor,
-		{ provide: 'SEQUELIZE', useExisting: Sequelize },
-	],
+	exports: [UserService],
 })
 export class UserModule {}
