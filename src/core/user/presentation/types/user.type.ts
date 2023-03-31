@@ -11,9 +11,9 @@ export class FrontendUser {
 	constructor(user: User) {
 		this.id = user.id;
 		this.email = user.email;
-		// this.roles = user.roles.map((role) => ({
-		// 	id: role.id,
-		// 	name: role.name,
-		// }));
+		this.roles = user.roles.map((role) => ({
+			id: role.id,
+			name: role.name,
+		}));
 	}
 }

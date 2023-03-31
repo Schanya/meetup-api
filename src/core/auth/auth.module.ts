@@ -10,6 +10,7 @@ import { AuthController } from './application/auth.controller';
 import { AuthService } from './domain/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { RefreshStrategy } from './strategies/refresh.strategy';
 
 @Module({
 	imports: [
@@ -17,7 +18,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 		PassportModule,
 		JwtModule.register({
 			secret: process.env.ACCESS_TOKEN_SECRET,
-			signOptions: { expiresIn: '3600s' },
+			signOptions: { expiresIn: process.env.ACCESS_TOKEN_EXPIRED },
 		}),
 	],
 	controllers: [AuthController],
@@ -25,16 +26,10 @@ import { LocalStrategy } from './strategies/local.strategy';
 		AuthService,
 		LocalStrategy,
 		JwtStrategy,
+		RefreshStrategy,
 		TransactionInterceptor,
 		{ provide: 'SEQUELIZE', useExisting: Sequelize },
 	],
-	exports: [
-		AuthService,
-		JwtModule,
-		LocalStrategy,
-		JwtStrategy,
-		TransactionInterceptor,
-		{ provide: 'SEQUELIZE', useExisting: Sequelize },
-	],
+	exports: [AuthService],
 })
 export class AuthModule {}

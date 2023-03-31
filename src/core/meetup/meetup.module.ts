@@ -12,22 +12,13 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-	imports: [
-		SequelizeModule.forFeature([Meetup]),
-		FlagModule,
-		UserModule,
-		forwardRef(() => AuthModule),
-	],
+	imports: [SequelizeModule.forFeature([Meetup]), FlagModule, UserModule],
 	controllers: [MeetupController],
 	providers: [
 		MeetupService,
 		TransactionInterceptor,
 		{ provide: 'SEQUELIZE', useExisting: Sequelize },
 	],
-	exports: [
-		MeetupService,
-		TransactionInterceptor,
-		{ provide: 'SEQUELIZE', useExisting: Sequelize },
-	],
+	exports: [MeetupService],
 })
 export class MeetupModule {}

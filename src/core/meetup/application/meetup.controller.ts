@@ -35,6 +35,8 @@ import { RolesGuard } from 'src/core/auth/guards/role.guard';
 export class MeetupController {
 	constructor(readonly meetupService: MeetupService) {}
 
+	@Roles('ADMIN', 'USER', 'TEST')
+	@UseGuards(JwtAuthGuard, RolesGuard)
 	@HttpCode(HttpStatus.OK)
 	@Get()
 	async getAll(
