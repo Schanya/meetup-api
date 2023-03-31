@@ -3,4 +3,5 @@ export interface MeetupCreationAttrs {
 	description: string;
 	time: Date;
 	place: string;
+	userId: number;
 }

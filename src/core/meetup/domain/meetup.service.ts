@@ -26,6 +26,16 @@ export class MeetupService {
 		private flagService: FlagService,
 	) {}
 
+	public async findOne(options: MeetupOptions): Promise<Meetup> {
+		const suitableMeetup = await this.findBy({ ...options });
+
+		if (!suitableMeetup) {
+			throw new BadRequestException("There isn't suitable meetup");
+		}
+
+		return suitableMeetup;
+	}
+
 	public async findAll(
 		options: IReadAllMeetupOptions,
 	): Promise<ReadAllResult<Meetup>> {
@@ -64,10 +74,6 @@ export class MeetupService {
 			include: { all: true },
 		});
 
-		if (!suitableMeetup) {
-			throw new BadRequestException("There isn't suitable meetup");
-		}
-
 		return suitableMeetup;
 	}
 
@@ -94,14 +100,18 @@ export class MeetupService {
 	public async create(
 		createMeetupDto: CreateMeetupDto,
 		transaction: Transaction,
+		userId: number,
 	): Promise<Meetup> {
 		const resultFlags = await this.flagArrayHandler(createMeetupDto.flags);
 
 		const { flags, ...rest } = createMeetupDto;
 
-		const createdMeetup = await this.meetupRepository.create(createMeetupDto, {
-			transaction,
-		});
+		const createdMeetup = await this.meetupRepository.create(
+			{ ...createMeetupDto, userId: userId },
+			{
+				transaction,
+			},
+		);
 
 		for await (const flag of resultFlags) {
 			await createdMeetup.$add('flags', flag, { transaction });
@@ -127,24 +137,30 @@ export class MeetupService {
 
 		const { flags, ...meetupUpdateOptions } = updateMeetupDto;
 
-		await this.meetupRepository.update(meetupUpdateOptions, {
-			where: { id },
-			transaction,
-			returning: true,
-		});
+		const [numberUpdatedRows, updatedMeetups] =
+			await this.meetupRepository.update(meetupUpdateOptions, {
+				where: { id },
+				transaction,
+				returning: true,
+			});
 
-		const existingFlags: Flag[] = await existingMeetup.$get('flags');
-		await existingMeetup.$remove('flags', existingFlags, { transaction });
+		let newFlags: Flag[];
+		if (flags) {
+			const existingFlags: Flag[] = await existingMeetup.$get('flags');
+			await existingMeetup.$remove('flags', existingFlags, { transaction });
 
-		const resultFlags = await this.flagArrayHandler(flags);
-		await existingMeetup.$add('flags', resultFlags, { transaction });
+			newFlags = await this.flagArrayHandler(flags);
+			await existingMeetup.$add('flags', newFlags, { transaction });
+		}
 
-		const updatedMeetup = await this.findBy({ id });
+		updatedMeetups[0].flags = newFlags?.length
+			? newFlags
+			: existingMeetup.flags;
 
-		return updatedMeetup;
+		return updatedMeetups[0];
 	}
 
-	public async delete(id: number, transaction: Transaction): Promise<number> {
+	public async delete(id: number, transaction: Transaction): Promise<void> {
 		const numberDeletedRows = await this.meetupRepository.destroy({
 			where: { id },
 			transaction,
@@ -152,7 +168,5 @@ export class MeetupService {
 
 		if (!numberDeletedRows)
 			throw new BadRequestException('There is no suitable meetup');
-
-		return numberDeletedRows;
 	}
 }

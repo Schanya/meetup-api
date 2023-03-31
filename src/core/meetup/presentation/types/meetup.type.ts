@@ -1,3 +1,4 @@
+import { User } from 'src/core/user/domain/user.entity';
 import { Meetup } from '../../domain/meetup.entity';
 
 export class FrontendMeetup {
@@ -6,6 +7,7 @@ export class FrontendMeetup {
 	public description: string;
 	public time: Date;
 	public place: string;
+	public user: User;
 	public flags: {
 		id: number;
 		name: string;
@@ -17,6 +19,7 @@ export class FrontendMeetup {
 		this.description = meetup.description;
 		this.time = meetup.time;
 		this.place = meetup.place;
+		this.user = meetup.userId;
 		this.flags = meetup.flags.map((flag) => ({
 			id: flag.id,
 			name: flag.name,

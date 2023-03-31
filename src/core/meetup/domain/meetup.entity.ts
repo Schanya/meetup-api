@@ -2,10 +2,12 @@ import {
 	BelongsToMany,
 	Column,
 	DataType,
+	ForeignKey,
 	Model,
 	Table,
 } from 'sequelize-typescript';
 import { Flag } from 'src/core/flag/domain/flag.entity';
+import { User } from 'src/core/user/domain/user.entity';
 import { MeetupCreationAttrs } from '../infrastructure/meetup.interface';
 
 @Table({ tableName: 'meetups', paranoid: true })
@@ -32,4 +34,7 @@ export class Meetup extends Model<Meetup, MeetupCreationAttrs> {
 
 	@BelongsToMany(() => Flag, 'meetups_flags', 'meetup_id', 'flag_id')
 	flags: Flag[];
+
+	@ForeignKey(() => User)
+	userId: User;
 }

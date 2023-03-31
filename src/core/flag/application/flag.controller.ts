@@ -45,7 +45,7 @@ export class FlagController {
 	@HttpCode(HttpStatus.OK)
 	@Get(':id')
 	async getOne(@Param('id') id: number) {
-		const flag = await this.flagService.findBy({ id: id });
+		const flag = await this.flagService.findOne({ id: id });
 
 		return new FrontendFlag(flag);
 	}
@@ -70,11 +70,9 @@ export class FlagController {
 		return new FrontendFlag(updatedFlag);
 	}
 
-	@HttpCode(HttpStatus.OK)
+	@HttpCode(HttpStatus.NO_CONTENT)
 	@Delete(':id')
 	async delete(@Param('id') id: number) {
 		await this.flagService.delete(id);
-
-		return `Flag deleted successfully`;
 	}
 }
