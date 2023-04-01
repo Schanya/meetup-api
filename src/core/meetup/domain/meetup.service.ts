@@ -1,15 +1,23 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Flag } from 'src/core/flag/domain/flag.entity';
+import { Transaction } from 'sequelize';
 
+import { Meetup } from './meetup.entity';
+
+import { Flag } from 'src/core/flag/domain/flag.entity';
 import { FlagService } from 'src/core/flag/domain/flag.service';
 
-import {
-	MeetupDto,
-	MeetupOptions,
-	UpdateMeetupOptions,
-} from '../presentation/meetup.dto';
-import { Meetup } from './meetup.entity';
+import { defaultPagination } from 'src/common/constants/pagination.constants';
+import { defaultSorting } from 'src/common/constants/sorting.constants';
+
+import { ReadAllResult } from 'src/common/types/read-all.options';
+import { IReadAllMeetupOptions } from '../infrastructure/read-all-meetup.interface';
+
+import { MeetupFiltration } from './meetup.filter';
+
+import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
+import { MeetupOptions } from '../presentation/dto/find-meetup.options';
+import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
 
 @Injectable()
 export class MeetupService {
@@ -18,13 +26,46 @@ export class MeetupService {
 		private flagService: FlagService,
 	) {}
 
-	public async findAll(options: MeetupOptions): Promise<Meetup[]> {
-		const suitableMeetups = await this.meetupRepository.findAll({
-			where: { ...options },
-			include: { all: true },
+	public async findOne(options: MeetupOptions): Promise<Meetup> {
+		const suitableMeetup = await this.findBy({ ...options });
+
+		if (!suitableMeetup) {
+			throw new BadRequestException("There isn't suitable meetup");
+		}
+
+		return suitableMeetup;
+	}
+
+	public async findAll(
+		options: IReadAllMeetupOptions,
+	): Promise<ReadAllResult<Meetup>> {
+		const pagination = options.pagination ?? defaultPagination;
+		const sorting = options.sorting ?? defaultSorting;
+		const filter = MeetupFiltration.getLikeFilters(options.filter);
+
+		const { count, rows } = await this.meetupRepository.findAndCountAll({
+			where: { ...filter.meetupFilters },
+			include: [
+				{
+					model: Flag,
+					all: true,
+					where: filter.flagsFilters,
+				},
+			],
+			distinct: true,
+			limit: pagination.size,
+			offset: pagination.offset,
+			order: [[sorting.column, sorting.direction]],
 		});
 
-		return suitableMeetups;
+		for (let i = 0; i < rows.length; i++) {
+			rows[i].flags = await rows[i].$get('flags');
+		}
+
+		return {
+			totalRecordsNumber: count,
+			entities: rows,
+		};
 	}
 
 	public async findBy(options: MeetupOptions): Promise<Meetup> {
@@ -32,10 +73,6 @@ export class MeetupService {
 			where: { ...options },
 			include: { all: true },
 		});
-
-		if (!suitableMeetup) {
-			throw new BadRequestException("There isn't suitable meetup");
-		}
 
 		return suitableMeetup;
 	}
@@ -60,33 +97,37 @@ export class MeetupService {
 		return resultFlags;
 	}
 
-	public async create(meetupDto: MeetupDto): Promise<Meetup> {
-		// const existingMeetup = await this.findBy({ title: meetupDto.title }); Should title be uniq?
+	public async create(
+		createMeetupDto: CreateMeetupDto,
+		transaction: Transaction,
+		userId: number,
+	): Promise<Meetup> {
+		const resultFlags = await this.flagArrayHandler(createMeetupDto.flags);
 
-		// if (existingMeetup) {
-		// 	throw new BadRequestException('Such meetup has already exist');
-		// }
+		const { flags, ...rest } = createMeetupDto;
 
-		const resultFlags = await this.flagArrayHandler(meetupDto.flags);
-
-		const { flags, ...rest } = meetupDto;
-
-		const createdMeetup = await this.meetupRepository.create(meetupDto);
+		const createdMeetup = await this.meetupRepository.create(
+			{ ...createMeetupDto, userId: userId },
+			{
+				transaction,
+			},
+		);
 
 		for await (const flag of resultFlags) {
-			await createdMeetup.$add('flags', flag);
+			await createdMeetup.$add('flags', flag, { transaction });
 		}
 
 		createdMeetup.flags = resultFlags;
 
-		await createdMeetup.save();
+		await createdMeetup.save({ transaction });
 
 		return createdMeetup;
 	}
 
 	public async update(
 		id: number,
-		meetupOptions: MeetupOptions,
+		updateMeetupDto: UpdateMeetupDto,
+		transaction: Transaction,
 	): Promise<Meetup> {
 		const existingMeetup = await this.findBy({ id: id });
 
@@ -94,39 +135,38 @@ export class MeetupService {
 			throw new BadRequestException("Such meetup doesn't exist");
 		}
 
-		// const existingMeetup = await this.findBy({ title: meetupDto.title });  Should title be uniq?
+		const { flags, ...meetupUpdateOptions } = updateMeetupDto;
 
-		// if (existingMeetup) {
-		// 	throw new BadRequestException('Such meetup has already exist');
-		// }
+		const [numberUpdatedRows, updatedMeetups] =
+			await this.meetupRepository.update(meetupUpdateOptions, {
+				where: { id },
+				transaction,
+				returning: true,
+			});
 
-		const updateMeetupOptions: UpdateMeetupOptions = {
-			...meetupOptions,
-		};
+		let newFlags: Flag[];
+		if (flags) {
+			const existingFlags: Flag[] = await existingMeetup.$get('flags');
+			await existingMeetup.$remove('flags', existingFlags, { transaction });
 
-		await this.meetupRepository.update(updateMeetupOptions, {
-			where: { id },
-		});
+			newFlags = await this.flagArrayHandler(flags);
+			await existingMeetup.$add('flags', newFlags, { transaction });
+		}
 
-		const existingFlags: Flag[] = await existingMeetup.$get('flags');
-		await existingMeetup.$remove('flags', existingFlags);
+		updatedMeetups[0].flags = newFlags?.length
+			? newFlags
+			: existingMeetup.flags;
 
-		const resultFlags = await this.flagArrayHandler(meetupOptions.flags);
-		await existingMeetup.$add('flags', resultFlags);
-
-		const updatedMeetup = await this.findBy({ id: id });
-
-		return updatedMeetup;
+		return updatedMeetups[0];
 	}
 
-	public async delete(id: number): Promise<number> {
+	public async delete(id: number, transaction: Transaction): Promise<void> {
 		const numberDeletedRows = await this.meetupRepository.destroy({
 			where: { id },
+			transaction,
 		});
 
 		if (!numberDeletedRows)
 			throw new BadRequestException('There is no suitable meetup');
-
-		return numberDeletedRows;
 	}
 }
