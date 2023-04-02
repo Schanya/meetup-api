@@ -89,10 +89,12 @@ export class UserService {
 			transaction,
 		});
 
-		const role = await this.roleService.findBy({ name: 'TEST' });
+		const role = await this.roleService.findBy({ name: 'USER' });
 		await createdUser.$add('role', role, { transaction });
 
 		await createdUser.save({ transaction });
+
+		createdUser.roles = [role];
 
 		return createdUser;
 	}
