@@ -96,7 +96,6 @@ export class MeetupService {
 			include: [
 				{
 					model: Flag,
-					all: true,
 					where: filter.flagsFilters,
 				},
 			],
@@ -167,6 +166,7 @@ export class MeetupService {
 
 		createdMeetup.flags = resultFlags;
 		createdMeetup.author = user;
+		createdMeetup.members = [];
 
 		await createdMeetup.save({ transaction });
 

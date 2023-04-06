@@ -25,7 +25,8 @@
     "db:migrate:create": "ts-node -T -r tsconfig-paths/register practice.ts",
     "db:migrate:undo": "sequelize db:migrate:undo",
     "db:migrate:undo:all": "sequelize db:migrate:undo:all",
-    "db:init": "npx sequelize-cli db:seed:all"
+    "db:init": "npx sequelize-cli db:seed:all",
+    "docker:run": "npm uninstall bcrypt && npm i bcrypt && npm run db:create & npm run db:migrate & npm run db:init & npm run start"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
