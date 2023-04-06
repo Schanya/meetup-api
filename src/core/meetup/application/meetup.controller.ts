@@ -30,10 +30,49 @@ import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
 import { Roles } from 'src/common/interseptors/role.decorator';
 import { JwtAuthGuard } from 'src/core/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/core/auth/guards/role.guard';
+import { UserParam } from 'src/common/decorators/user.decorator';
+import { PayloadDto } from 'src/core/auth/presentation/payload.dto';
 
 @Controller('meetup')
 export class MeetupController {
 	constructor(readonly meetupService: MeetupService) {}
+
+	@Roles('ADMIN', 'USER', 'TEST')
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@UseInterceptors(TransactionInterceptor)
+	@HttpCode(HttpStatus.CREATED)
+	@Post('register-for-meetup/:id')
+	public async joinToMeetup(
+		@UserParam() user: PayloadDto,
+		@Param('id') meetupId: number,
+		@TransactionParam() transaction: Transaction,
+	): Promise<FrontendMeetup> {
+		const meetup = await this.meetupService.registerForMeetup(
+			user.id,
+			meetupId,
+			transaction,
+		);
+
+		return new FrontendMeetup(meetup);
+	}
+
+	@Roles('ADMIN', 'USER', 'TEST')
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@UseInterceptors(TransactionInterceptor)
+	@HttpCode(HttpStatus.CREATED)
+	@Post('unregister-for-meetup/:id')
+	public async leaveFromMeetup(
+		@UserParam() user: PayloadDto,
+		@Param('id') meetupId: number,
+		@TransactionParam() transaction: Transaction,
+	): Promise<FrontendMeetup> {
+		const meetup = await this.meetupService.unregisterForMeetup(
+			user.id,
+			meetupId,
+			transaction,
+		);
+		return new FrontendMeetup(meetup);
+	}
 
 	@Roles('ADMIN', 'USER', 'TEST')
 	@UseGuards(JwtAuthGuard, RolesGuard)
@@ -72,14 +111,14 @@ export class MeetupController {
 	@HttpCode(HttpStatus.CREATED)
 	@Post()
 	async create(
-		@Request() req,
+		@UserParam() user: PayloadDto,
 		@Body() createMeetupDto: CreateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const meetup = await this.meetupService.create(
 			createMeetupDto,
 			transaction,
-			req.user.id,
+			user.id,
 		);
 
 		return new FrontendMeetup(meetup);

@@ -18,13 +18,61 @@ import { MeetupFiltration } from './meetup.filter';
 import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
 import { MeetupOptions } from '../presentation/dto/find-meetup.options';
 import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
+import { UserService } from 'src/core/user/domain/user.service';
+import { User } from 'src/core/user/domain/user.entity';
 
 @Injectable()
 export class MeetupService {
 	constructor(
 		@InjectModel(Meetup) private meetupRepository: typeof Meetup,
 		private flagService: FlagService,
+		private userService: UserService,
 	) {}
+
+	public async registerForMeetup(
+		userId: number,
+		meetupId: number,
+		transaction: Transaction,
+	) {
+		const meetup = await this.findOne({ id: meetupId });
+		const user = await this.userService.findOne({ id: userId });
+
+		const members = await meetup.$get('members', { transaction });
+		const alreadyRegistered = members.find((user: User) => user.id === user.id);
+
+		if (alreadyRegistered) {
+			throw new BadRequestException('you are already registered');
+		}
+
+		await meetup.$add('members', user, { transaction });
+
+		const newMeetup = await this.findOne({ id: meetup.id });
+		newMeetup.members.push(user);
+
+		return newMeetup;
+	}
+
+	public async unregisterForMeetup(
+		userId: number,
+		meetupId: number,
+		transaction: Transaction,
+	) {
+		const meetup = await this.findOne({ id: meetupId });
+		const user = await this.userService.findOne({ id: userId });
+
+		const members = await meetup.$get('members', { transaction });
+		const alreadyRegistered = members.find((user: User) => user.id === user.id);
+
+		if (!alreadyRegistered) {
+			throw new BadRequestException("you aren't member of this meetup");
+		}
+		await meetup.$remove('members', user, { transaction });
+
+		const newMeetup = await this.findOne({ id: meetup.id });
+		newMeetup.members = members.filter((member) => member.id != user.id);
+
+		return newMeetup;
+	}
 
 	public async findOne(options: MeetupOptions): Promise<Meetup> {
 		const suitableMeetup = await this.findBy({ ...options });
@@ -106,18 +154,19 @@ export class MeetupService {
 
 		const { flags, ...rest } = createMeetupDto;
 
-		const createdMeetup = await this.meetupRepository.create(
-			{ ...createMeetupDto, userId: userId },
-			{
-				transaction,
-			},
-		);
+		const createdMeetup = await this.meetupRepository.create(createMeetupDto, {
+			transaction,
+		});
+
+		const user = await this.userService.findOne({ id: userId });
+		await createdMeetup.$set('author', user, { transaction });
 
 		for await (const flag of resultFlags) {
 			await createdMeetup.$add('flags', flag, { transaction });
 		}
 
 		createdMeetup.flags = resultFlags;
+		createdMeetup.author = user;
 
 		await createdMeetup.save({ transaction });
 

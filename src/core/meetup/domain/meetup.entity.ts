@@ -1,4 +1,5 @@
 import {
+	BelongsTo,
 	BelongsToMany,
 	Column,
 	DataType,
@@ -35,6 +36,9 @@ export class Meetup extends Model<Meetup, MeetupCreationAttrs> {
 	@BelongsToMany(() => Flag, 'meetups_flags', 'meetup_id', 'flag_id')
 	flags: Flag[];
 
-	@ForeignKey(() => User)
-	userId: User;
+	@BelongsTo(() => User, 'author_id')
+	author: User;
+
+	@BelongsToMany(() => User, 'meetups_users', 'meetup_id', 'user_id')
+	members: User[];
 }
