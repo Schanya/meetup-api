@@ -29,6 +29,7 @@ const bootstrap = async () => {
 			useSnakeCase: false,
 		});
 		console.log(result);
+		sequelize.close();
 	} catch (e) {
 		console.log(e);
 	}

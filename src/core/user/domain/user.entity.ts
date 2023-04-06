@@ -29,6 +29,9 @@ export class User extends Model<User, UserCreationAttrs> {
 	@BelongsToMany(() => Role, 'users_roles', 'user_id', 'role_id')
 	roles: Role[];
 
-	@HasMany(() => Meetup)
+	@HasMany(() => Meetup, 'author_id')
 	meetups: Meetup[];
+
+	@BelongsToMany(() => Meetup, 'meetups_users', 'user_id', 'meetup_id')
+	invitedToMeetups: Meetup[];
 }
