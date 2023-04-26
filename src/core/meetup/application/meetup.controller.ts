@@ -27,7 +27,7 @@ import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
 import { ReadAllMeetupDto } from '../presentation/dto/read-all-meetup.dto';
 import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
 
-import { Roles } from 'src/common/interseptors/role.decorator';
+import { Roles } from 'src/common/decorators/role.decorator';
 import { JwtAuthGuard } from 'src/core/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/core/auth/guards/role.guard';
 import { UserParam } from 'src/common/decorators/user.decorator';

@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from 'src/core/user/domain/user.service';
+import { PayloadDto } from '../presentation/payload.dto';
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
@@ -22,7 +23,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 		});
 	}
 
-	async validate(payload: any) {
+	async validate(payload: PayloadDto) {
 		if (!payload) {
 			throw new BadRequestException('invalid jwt token');
 		}
