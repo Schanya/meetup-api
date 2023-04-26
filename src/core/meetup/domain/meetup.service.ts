@@ -37,6 +37,10 @@ export class MeetupService {
 		const meetup = await this.findOne({ id: meetupId });
 		const user = await this.userService.findOne({ id: userId });
 
+		if (meetup.author.id == user.id) {
+			throw new BadRequestException('you are already registered like author');
+		}
+
 		const members = await meetup.$get('members', { transaction });
 		const alreadyRegistered = members.find((user: User) => user.id === user.id);
 
@@ -96,8 +100,15 @@ export class MeetupService {
 			include: [
 				{
 					model: Flag,
-					all: true,
 					where: filter.flagsFilters,
+				},
+				{
+					model: User,
+					as: 'author',
+				},
+				{
+					model: User,
+					as: 'members',
 				},
 			],
 			distinct: true,
@@ -167,6 +178,7 @@ export class MeetupService {
 
 		createdMeetup.flags = resultFlags;
 		createdMeetup.author = user;
+		createdMeetup.members = [];
 
 		await createdMeetup.save({ transaction });
 
