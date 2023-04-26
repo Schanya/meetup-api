@@ -12,12 +12,12 @@ import {
 } from '@nestjs/common';
 import { ReadAllResult } from 'src/common/types/read-all.options';
 import { Flag } from '../domain/flag.entity';
-import { FlagService } from '../domain/flag.service';
-import { CreateFlagDto } from '../presentation/dto/create-flag.dto';
-import { FlagOptions } from '../presentation/dto/find-flag.options';
-import { ReadAllFlagDto } from '../presentation/dto/read-all-flag.dto';
+import { FlagService } from '../application/flag.service';
+import { CreateFlagDto } from '../domain/dto/create-flag.dto';
+import { FlagOptions } from '../domain/dto/find-flag.options';
+import { ReadAllFlagDto } from '../domain/dto/read-all-flag.dto';
 
-import { FrontendFlag } from '../presentation/types/flag.type';
+import { FrontendFlag } from '../domain/types/flag.type';
 
 @Controller('flag')
 export class FlagController {

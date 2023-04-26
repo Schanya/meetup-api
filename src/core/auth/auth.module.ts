@@ -6,11 +6,11 @@ import { Sequelize } from 'sequelize-typescript';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
 
 import { UserModule } from '../user/user.module';
-import { AuthController } from './application/auth.controller';
-import { AuthService } from './domain/auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
-import { RefreshStrategy } from './strategies/refresh.strategy';
+import { AuthController } from './presentation/auth.controller';
+import { AuthService } from './application/auth.service';
+import { JwtStrategy } from './domain/strategies/jwt.strategy';
+import { LocalStrategy } from './domain/strategies/local.strategy';
+import { RefreshStrategy } from './domain/strategies/refresh.strategy';
 
 @Module({
 	imports: [

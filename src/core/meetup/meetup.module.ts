@@ -4,8 +4,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { FlagModule } from '../flag/flag.module';
 
 import { Meetup } from './domain/meetup.entity';
-import { MeetupController } from './application/meetup.controller';
-import { MeetupService } from './domain/meetup.service';
+import { MeetupController } from './presentation/meetup.controller';
+import { MeetupService } from './application/meetup.service';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
 import { Sequelize } from 'sequelize-typescript';
 import { UserModule } from '../user/user.module';

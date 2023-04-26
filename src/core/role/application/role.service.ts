@@ -3,12 +3,12 @@ import { InjectModel } from '@nestjs/sequelize';
 import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
 import { ReadAllResult } from 'src/common/types/read-all.options';
-import { IReadAllRoleOptions } from '../infrastructure/read-all-role.interface';
-import { CreateRoleDto } from '../presentation/dto/create-role.dto';
-import { RoleOptions } from '../presentation/dto/find-role.options';
-import { UpdateRoleDto } from '../presentation/dto/update-role.dto';
-import { Role } from './role.entity';
-import { RoleFiltration } from './role.filter';
+import { IReadAllRoleOptions } from '../domain/read-all-role.interface';
+import { CreateRoleDto } from '../domain/dto/create-role.dto';
+import { RoleOptions } from '../domain/dto/find-role.options';
+import { UpdateRoleDto } from '../domain/dto/update-role.dto';
+import { Role } from '../domain/role.entity';
+import { RoleFiltration } from '../domain/role.filter';
 
 @Injectable()
 export class RoleService {
