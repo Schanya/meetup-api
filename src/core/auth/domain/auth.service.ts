@@ -1,10 +1,8 @@
 import {
-	BadRequestException,
 	HttpException,
 	HttpStatus,
 	Injectable,
 	NotFoundException,
-	UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Transaction } from 'sequelize';
@@ -72,18 +70,10 @@ export class AuthService {
 	}
 
 	public async refresh(payload) {
-		try {
-			const newAccessToken = await this.generateAccessToken(payload);
-			const newRefreshToken = await this.generateRefreshToken(payload);
+		const newAccessToken = await this.generateAccessToken(payload);
+		const newRefreshToken = await this.generateRefreshToken(payload);
 
-			return { accessToken: newAccessToken, refreshToken: newRefreshToken };
-		} catch (err) {
-			if (err.name === 'TokenExpiredError') {
-				throw new UnauthorizedException('refresh token expired');
-			} else {
-				throw new BadRequestException('refresh token is invalid');
-			}
-		}
+		return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 	}
 
 	private async generateAccessToken(user: User) {
