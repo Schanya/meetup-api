@@ -3,7 +3,10 @@ config();
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+
 import { AppModule } from './app.module';
+import { SwaggerModule } from '@nestjs/swagger';
+import { swaggerConfig } from './configs/swagger-module-options.config';
 
 import * as cookieParser from 'cookie-parser';
 
@@ -17,6 +20,12 @@ async function bootstrap() {
 			forbidNonWhitelisted: true,
 			transform: true,
 		}),
+	);
+
+	SwaggerModule.setup(
+		'doc',
+		app,
+		SwaggerModule.createDocument(app, swaggerConfig),
 	);
 
 	app.use(cookieParser());
