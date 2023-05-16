@@ -9,9 +9,11 @@ import {
 	Post,
 	Put,
 	Query,
+	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
 import {
+	ApiCookieAuth,
 	ApiExtraModels,
 	ApiOperation,
 	ApiResponse,
@@ -32,12 +34,16 @@ import { ReadAllUserDto } from '../domain/dto/read-all-user.dto';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
 import { FrontendUser } from '../domain/types/user.type';
 import { User } from '../domain/user.entity';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
+import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 
 @ApiTags('User')
 @ApiExtraModels(ReadAllUserDto, BaseReadAllDto)
+@ApiCookieAuth()
 @Controller('user')
-// @Roles('ADMIN', 'TEST')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN', 'TEST')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
 	constructor(readonly userService: UserService) {}
 

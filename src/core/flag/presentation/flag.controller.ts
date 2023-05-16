@@ -9,9 +9,11 @@ import {
 	Post,
 	Put,
 	Query,
+	UseGuards,
 } from '@nestjs/common';
 
 import {
+	ApiCookieAuth,
 	ApiExtraModels,
 	ApiOperation,
 	ApiResponse,
@@ -31,12 +33,16 @@ import { ReadAllFlagDto } from '../domain/dto/read-all-flag.dto';
 
 import { FrontendFlag } from '../domain/types/flag.type';
 import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
+import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 
 @ApiTags('Flag')
 @ApiExtraModels(ReadAllFlagDto, BaseReadAllDto)
+@ApiCookieAuth()
 @Controller('flag')
-// @Roles('ADMIN', 'USER', 'TEST')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN', 'USER', 'TEST')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class FlagController {
 	constructor(readonly flagService: FlagService) {}
 

@@ -33,6 +33,7 @@ import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 import { UserParam } from 'src/common/decorators/user.decorator';
 import { PayloadDto } from 'src/core/auth/domain/payload.dto';
 import {
+	ApiCookieAuth,
 	ApiExtraModels,
 	ApiOperation,
 	ApiResponse,
@@ -46,9 +47,10 @@ import {
 
 @ApiTags('Meetup')
 @ApiExtraModels(ReadAllMeetupDto, BaseReadAllDto, PayloadDto)
+@ApiCookieAuth()
 @Controller('meetup')
-// @Roles('ADMIN', 'TEST')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN', 'TEST')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class MeetupController {
 	constructor(readonly meetupService: MeetupService) {}
 

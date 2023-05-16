@@ -9,6 +9,7 @@ import {
 	Post,
 	Put,
 	Query,
+	UseGuards,
 } from '@nestjs/common';
 import { ReadAllResult } from 'src/common/types/read-all.options';
 import { Role } from '../domain/role.entity';
@@ -18,6 +19,7 @@ import { ReadAllRoleDto } from '../domain/dto/read-all-role.dto';
 import { UpdateRoleDto } from '../domain/dto/update-role.dto';
 import { FrontendRole } from '../domain/types/role.type';
 import {
+	ApiCookieAuth,
 	ApiExtraModels,
 	ApiOperation,
 	ApiResponse,
@@ -28,12 +30,16 @@ import {
 	createRoleLinksOptions,
 	getAllRoleSchemaOptions,
 } from 'src/core/swagger/role.options';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
+import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 
 @ApiTags('Role')
 @ApiExtraModels(ReadAllRoleDto, BaseReadAllDto)
+@ApiCookieAuth()
 @Controller('role')
-// @Roles('ADMIN', 'TEST')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN', 'TEST')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class RoleController {
 	constructor(readonly roleService: RoleService) {}
 
