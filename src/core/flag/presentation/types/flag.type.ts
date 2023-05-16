@@ -1,10 +1,10 @@
-import { Op } from 'sequelize';
-import { IPaginationOptions } from 'src/common/types/pagination-options';
-import { ISortingOptions } from 'src/common/types/sorting.options';
+import { ApiProperty } from '@nestjs/swagger';
 import { Flag } from '../../domain/flag.entity';
 
 export class FrontendFlag {
+	@ApiProperty({ description: 'Flag identifier', example: 1 })
 	public id: number;
+	@ApiProperty({ description: 'Flag name', example: 'Test' })
 	public name: string;
 
 	constructor(tag: Flag) {
