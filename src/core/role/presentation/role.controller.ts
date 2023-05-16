@@ -32,6 +32,8 @@ import {
 @ApiTags('Role')
 @ApiExtraModels(ReadAllRoleDto, BaseReadAllDto)
 @Controller('role')
+// @Roles('ADMIN', 'TEST')
+// @UseGuards(JwtAuthGuard, RolesGuard)
 export class RoleController {
 	constructor(readonly roleService: RoleService) {}
 

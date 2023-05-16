@@ -124,6 +124,10 @@ export class UserService {
 			},
 		);
 
+		const role = await updatedUsers[0].$get('roles', { transaction });
+
+		updatedUsers[0].roles = role;
+
 		return updatedUsers[0];
 	}
 

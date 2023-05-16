@@ -35,14 +35,14 @@ import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
 @ApiTags('Flag')
 @ApiExtraModels(ReadAllFlagDto, BaseReadAllDto)
 @Controller('flag')
+// @Roles('ADMIN', 'USER', 'TEST')
+// @UseGuards(JwtAuthGuard, RolesGuard)
 export class FlagController {
 	constructor(readonly flagService: FlagService) {}
 
 	@Get()
-	// @Roles('ADMIN', 'USER', 'TEST')
-	// @UseGuards(JwtAuthGuard, RolesGuard)
 	@HttpCode(HttpStatus.OK)
-	@ApiOperation({ summary: 'Get all suitable flag for the user' })
+	@ApiOperation({ summary: 'Get all suitable flags for the user' })
 	@ApiResponse({
 		status: HttpStatus.OK,
 		description: 'Success',
