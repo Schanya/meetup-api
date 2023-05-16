@@ -85,7 +85,7 @@ export class FlagController {
 
 	@Post()
 	@HttpCode(HttpStatus.CREATED)
-	@ApiOperation({ summary: 'Creates a new flag for the user' })
+	@ApiOperation({ summary: 'Create a new flag for the user' })
 	@ApiResponse({
 		status: HttpStatus.CREATED,
 		description: 'Success',

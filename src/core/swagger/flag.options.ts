@@ -1,5 +1,5 @@
 import { getSchemaPath } from '@nestjs/swagger';
-import { FrontendFlag } from '../flag/presentation/types/flag.type';
+import { FrontendFlag } from '../flag/domain/types/flag.type';
 
 export const createFlagLinksOptions = {
 	getOne: {
