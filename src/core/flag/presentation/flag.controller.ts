@@ -23,16 +23,14 @@ import {
 } from 'src/core/swagger/flag.options';
 
 import { ReadAllResult } from 'src/common/types/read-all.options';
-
-import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
-import { CreateFlagDto } from '../presentation/dto/create-flag.dto';
-import { FlagOptions } from '../presentation/dto/find-flag.options';
-import { ReadAllFlagDto } from '../presentation/dto/read-all-flag.dto';
-
 import { Flag } from '../domain/flag.entity';
-import { FlagService } from '../domain/flag.service';
+import { FlagService } from '../application/flag.service';
+import { CreateFlagDto } from '../domain/dto/create-flag.dto';
+import { FlagOptions } from '../domain/dto/find-flag.options';
+import { ReadAllFlagDto } from '../domain/dto/read-all-flag.dto';
 
-import { FrontendFlag } from '../presentation/types/flag.type';
+import { FrontendFlag } from '../domain/types/flag.type';
+import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
 
 @ApiTags('Flag')
 @ApiExtraModels(ReadAllFlagDto, BaseReadAllDto)

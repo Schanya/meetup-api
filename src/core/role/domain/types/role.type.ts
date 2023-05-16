@@ -1,4 +1,4 @@
-import { Role } from '../../domain/role.entity';
+import { Role } from '../role.entity';
 
 export class FrontendRole {
 	public id: number;

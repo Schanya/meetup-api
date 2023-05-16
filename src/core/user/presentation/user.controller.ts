@@ -16,11 +16,11 @@ import { TransactionParam } from 'src/common/decorators/transaction.decorator';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
 import { ReadAllResult } from 'src/common/types/read-all.options';
 import { User } from '../domain/user.entity';
-import { UserService } from '../domain/user.service';
-import { CreateUserDto } from '../presentation/dto/create-user.dto';
-import { ReadAllUserDto } from '../presentation/dto/read-all-user.dto';
-import { UpdateUserDto } from '../presentation/dto/update-user.dto';
-import { FrontendUser } from '../presentation/types/user.type';
+import { UserService } from '../application/user.service';
+import { CreateUserDto } from '../domain/dto/create-user.dto';
+import { ReadAllUserDto } from '../domain/dto/read-all-user.dto';
+import { UpdateUserDto } from '../domain/dto/update-user.dto';
+import { FrontendUser } from '../domain/types/user.type';
 
 @Controller('user')
 export class UserController {

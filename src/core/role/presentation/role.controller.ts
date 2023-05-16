@@ -12,11 +12,11 @@ import {
 } from '@nestjs/common';
 import { ReadAllResult } from 'src/common/types/read-all.options';
 import { Role } from '../domain/role.entity';
-import { RoleService } from '../domain/role.service';
-import { CreateRoleDto } from '../presentation/dto/create-role.dto';
-import { ReadAllRoleDto } from '../presentation/dto/read-all-role.dto';
-import { UpdateRoleDto } from '../presentation/dto/update-role.dto';
-import { FrontendRole } from '../presentation/types/role.type';
+import { RoleService } from '../application/role.service';
+import { CreateRoleDto } from '../domain/dto/create-role.dto';
+import { ReadAllRoleDto } from '../domain/dto/read-all-role.dto';
+import { UpdateRoleDto } from '../domain/dto/update-role.dto';
+import { FrontendRole } from '../domain/types/role.type';
 
 @Controller('role')
 export class RoleController {

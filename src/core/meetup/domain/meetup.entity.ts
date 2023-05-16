@@ -3,13 +3,12 @@ import {
 	BelongsToMany,
 	Column,
 	DataType,
-	ForeignKey,
 	Model,
 	Table,
 } from 'sequelize-typescript';
 import { Flag } from 'src/core/flag/domain/flag.entity';
 import { User } from 'src/core/user/domain/user.entity';
-import { MeetupCreationAttrs } from '../infrastructure/meetup.interface';
+import { MeetupCreationAttrs } from './meetup.interface';
 
 @Table({ tableName: 'meetups', paranoid: true })
 export class Meetup extends Model<Meetup, MeetupCreationAttrs> {
