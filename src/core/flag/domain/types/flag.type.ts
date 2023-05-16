@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { IPaginationOptions } from 'src/common/types/pagination-options';
 import { ISortingOptions } from 'src/common/types/sorting.options';
-import { Flag } from '../../domain/flag.entity';
+import { Flag } from '../flag.entity';
 
 export class FrontendFlag {
 	public id: number;

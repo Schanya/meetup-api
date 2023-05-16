@@ -1,4 +1,4 @@
-import { Meetup } from '../../domain/meetup.entity';
+import { Meetup } from '../meetup.entity';
 
 export class FrontendMeetup {
 	public id: number;

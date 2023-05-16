@@ -10,13 +10,13 @@ import {
 	UseInterceptors,
 } from '@nestjs/common';
 
-import { AuthService } from '../domain/auth.service';
+import { AuthService } from '../application/auth.service';
 
 import { Transaction } from 'sequelize';
 import { TransactionParam } from 'src/common/decorators/transaction.decorator';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
-import { CreateUserDto } from 'src/core/user/presentation/dto/create-user.dto';
-import { LocalAuthGuard } from '../guards/local.guard';
+import { CreateUserDto } from 'src/core/user/domain/dto/create-user.dto';
+import { LocalAuthGuard } from '../domain/guards/local.guard';
 
 import { AuthGuard } from '@nestjs/passport';
 

@@ -6,13 +6,13 @@ import { defaultSorting } from 'src/common/constants/sorting.constants';
 
 import { ReadAllResult } from 'src/common/types/read-all.options';
 
-import { CreateFlagDto } from '../presentation/dto/create-flag.dto';
-import { FlagOptions } from '../presentation/dto/find-flag.options';
+import { CreateFlagDto } from '../domain/dto/create-flag.dto';
+import { FlagOptions } from '../domain/dto/find-flag.options';
 
-import { IReadAllFlagOptions } from '../infrastructure/read-all-flag.interface';
+import { IReadAllFlagOptions } from '../domain/read-all-flag.interface';
 
-import { Flag } from './flag.entity';
-import { FlagFiltration } from './flag.filter';
+import { Flag } from '../domain/flag.entity';
+import { FlagFiltration } from '../domain/flag.filter';
 
 @Injectable()
 export class FlagService {

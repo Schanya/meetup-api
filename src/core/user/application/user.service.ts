@@ -5,13 +5,13 @@ import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
 import { ReadAllResult } from 'src/common/types/read-all.options';
 import { Role } from 'src/core/role/domain/role.entity';
-import { RoleService } from 'src/core/role/domain/role.service';
-import { IReadAllUserOptions } from '../infrastructure/read-all-user.interface';
-import { CreateUserDto } from '../presentation/dto/create-user.dto';
-import { UserOptions } from '../presentation/dto/find-user.options';
-import { UpdateUserDto } from '../presentation/dto/update-user.dto';
-import { User } from './user.entity';
-import { UserFiltration } from './user.filter';
+import { RoleService } from 'src/core/role/application/role.service';
+import { IReadAllUserOptions } from '../domain/read-all-user.interface';
+import { CreateUserDto } from '../domain/dto/create-user.dto';
+import { UserOptions } from '../domain/dto/find-user.options';
+import { UpdateUserDto } from '../domain/dto/update-user.dto';
+import { User } from '../domain/user.entity';
+import { UserFiltration } from '../domain/user.filter';
 
 @Injectable()
 export class UserService {

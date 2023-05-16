@@ -2,23 +2,23 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
 
-import { Meetup } from './meetup.entity';
+import { Meetup } from '../domain/meetup.entity';
 
 import { Flag } from 'src/core/flag/domain/flag.entity';
-import { FlagService } from 'src/core/flag/domain/flag.service';
+import { FlagService } from 'src/core/flag/application/flag.service';
 
 import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
 
 import { ReadAllResult } from 'src/common/types/read-all.options';
-import { IReadAllMeetupOptions } from '../infrastructure/read-all-meetup.interface';
+import { IReadAllMeetupOptions } from '../domain/read-all-meetup.interface';
 
-import { MeetupFiltration } from './meetup.filter';
+import { MeetupFiltration } from '../domain/meetup.filter';
 
-import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
-import { MeetupOptions } from '../presentation/dto/find-meetup.options';
-import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
-import { UserService } from 'src/core/user/domain/user.service';
+import { CreateMeetupDto } from '../domain/dto/create-meetup.dto';
+import { MeetupOptions } from '../domain/dto/find-meetup.options';
+import { UpdateMeetupDto } from '../domain/dto/update-meetup.dto';
+import { UserService } from 'src/core/user/application/user.service';
 import { User } from 'src/core/user/domain/user.entity';
 
 @Injectable()

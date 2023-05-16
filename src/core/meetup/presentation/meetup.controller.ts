@@ -20,18 +20,18 @@ import { TransactionInterceptor } from 'src/common/interseptors/transaction.inte
 import { ReadAllResult } from 'src/common/types/read-all.options';
 
 import { Meetup } from '../domain/meetup.entity';
-import { MeetupService } from '../domain/meetup.service';
-import { FrontendMeetup } from '../presentation/types/meetup.type';
+import { MeetupService } from '../application/meetup.service';
+import { FrontendMeetup } from '../domain/types/meetup.type';
 
-import { CreateMeetupDto } from '../presentation/dto/create-meetup.dto';
-import { ReadAllMeetupDto } from '../presentation/dto/read-all-meetup.dto';
-import { UpdateMeetupDto } from '../presentation/dto/update-meetup.dto';
+import { CreateMeetupDto } from '../domain/dto/create-meetup.dto';
+import { ReadAllMeetupDto } from '../domain/dto/read-all-meetup.dto';
+import { UpdateMeetupDto } from '../domain/dto/update-meetup.dto';
 
-import { Roles } from 'src/common/interseptors/role.decorator';
-import { JwtAuthGuard } from 'src/core/auth/guards/jwt.guard';
-import { RolesGuard } from 'src/core/auth/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
+import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 import { UserParam } from 'src/common/decorators/user.decorator';
-import { PayloadDto } from 'src/core/auth/presentation/payload.dto';
+import { PayloadDto } from 'src/core/auth/domain/payload.dto';
 
 @Controller('meetup')
 export class MeetupController {

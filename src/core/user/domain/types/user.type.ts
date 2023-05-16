@@ -1,4 +1,4 @@
-import { User } from '../../domain/user.entity';
+import { User } from '../user.entity';
 
 export class FrontendUser {
 	public id: number;
