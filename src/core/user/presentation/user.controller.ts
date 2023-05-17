@@ -9,25 +9,54 @@ import {
 	Post,
 	Put,
 	Query,
+	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
+import {
+	ApiCookieAuth,
+	ApiExtraModels,
+	ApiOperation,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger';
 import { Transaction } from 'sequelize';
 import { TransactionParam } from 'src/common/decorators/transaction.decorator';
+import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
 import { TransactionInterceptor } from 'src/common/interseptors/transaction.interseptor';
 import { ReadAllResult } from 'src/common/types/read-all.options';
-import { User } from '../domain/user.entity';
+import {
+	createUserLinksOptions,
+	getAllUserSchemaOptions,
+} from 'src/core/swagger/user.options';
 import { UserService } from '../application/user.service';
 import { CreateUserDto } from '../domain/dto/create-user.dto';
 import { ReadAllUserDto } from '../domain/dto/read-all-user.dto';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
 import { FrontendUser } from '../domain/types/user.type';
+import { User } from '../domain/user.entity';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
+import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 
+@ApiTags('User')
+@ApiExtraModels(ReadAllUserDto, BaseReadAllDto)
+@ApiCookieAuth()
 @Controller('user')
+@Roles('ADMIN', 'TEST')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
 	constructor(readonly userService: UserService) {}
 
-	@HttpCode(HttpStatus.OK)
 	@Get()
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: 'Get all suitable users ' })
+	@ApiResponse({
+		status: HttpStatus.OK,
+		description: 'Success',
+		schema: getAllUserSchemaOptions,
+	})
+	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async getAll(
 		@Query() readAllUserDto: ReadAllUserDto,
 	): Promise<ReadAllResult<FrontendUser>> {
@@ -45,17 +74,34 @@ export class UserController {
 		};
 	}
 
-	@HttpCode(HttpStatus.OK)
 	@Get(':id')
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: 'Get the suitable user by id ' })
+	@ApiResponse({
+		status: HttpStatus.OK,
+		description: 'Success',
+		type: FrontendUser,
+	})
+	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async getOne(@Param('id') id: number) {
 		const user = await this.userService.findOne({ id: id });
 
 		return new FrontendUser(user);
 	}
 
+	@Post()
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
-	@Post()
+	@ApiOperation({ summary: 'Create a new user' })
+	@ApiResponse({
+		status: HttpStatus.CREATED,
+		description: 'Success',
+		type: FrontendUser,
+		links: createUserLinksOptions,
+	})
+	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async create(
 		@Body() createUserDto: CreateUserDto,
 		@TransactionParam() transaction: Transaction,
@@ -65,9 +111,17 @@ export class UserController {
 		return new FrontendUser(user);
 	}
 
+	@Put(':id')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.OK)
-	@Put(':id')
+	@ApiOperation({ summary: 'Update user by id' })
+	@ApiResponse({
+		status: HttpStatus.OK,
+		description: 'Success',
+		type: FrontendUser,
+	})
+	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async update(
 		@Param('id')
 		id: number,
@@ -83,9 +137,16 @@ export class UserController {
 		return new FrontendUser(updatedUser);
 	}
 
+	@Delete(':id')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@Delete(':id')
+	@ApiOperation({ summary: 'Delete user by id ' })
+	@ApiResponse({
+		status: HttpStatus.NO_CONTENT,
+		description: 'Success',
+	})
+	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async delete(
 		@Param('id') id: number,
 		@TransactionParam() transaction: Transaction,
