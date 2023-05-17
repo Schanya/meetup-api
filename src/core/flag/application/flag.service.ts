@@ -13,12 +13,13 @@ import { IReadAllFlagOptions } from '../domain/interfaces/read-all-flag.interfac
 
 import { FlagFiltration } from '../domain/filters/flag.filter';
 import { Flag } from '../domain/flag.entity';
+import { FindFlagOptions } from '../domain/dto/find-flag.options';
 
 @Injectable()
 export class FlagService {
 	constructor(@InjectModel(Flag) private flagRepository: typeof Flag) {}
 
-	public async findOne(options: UpdateFlagDto): Promise<Flag> {
+	public async findOne(options: FindFlagOptions): Promise<Flag> {
 		const suitableFlag = await this.findBy({ ...options });
 
 		if (!suitableFlag) {
@@ -50,7 +51,7 @@ export class FlagService {
 		};
 	}
 
-	public async findBy(options: UpdateFlagDto): Promise<Flag> {
+	public async findBy(options: FindFlagOptions): Promise<Flag> {
 		const suitableFlag = await this.flagRepository.findOne({
 			where: { ...options },
 			include: { all: true },
