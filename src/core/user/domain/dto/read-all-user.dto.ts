@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDefined, IsOptional, IsString } from 'class-validator';
 import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
 
 export class ReadAllUserDto extends BaseReadAllDto {
@@ -10,9 +9,6 @@ export class ReadAllUserDto extends BaseReadAllDto {
 		required: false,
 		nullable: true,
 	})
-	@IsOptional()
-	@IsDefined()
-	@IsString()
 	email?: string;
 
 	@ApiProperty({
@@ -23,8 +19,5 @@ export class ReadAllUserDto extends BaseReadAllDto {
 		required: false,
 		nullable: true,
 	})
-	@IsOptional()
-	@IsDefined()
-	@IsArray()
 	roles?: string[];
 }

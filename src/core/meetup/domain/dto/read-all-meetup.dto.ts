@@ -1,14 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import {
-	IsArray,
-	IsDate,
-	IsDefined,
-	IsNotEmpty,
-	IsOptional,
-	IsString,
-	MaxLength,
-} from 'class-validator';
 import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
 
 export class ReadAllMeetupDto extends BaseReadAllDto {
@@ -18,9 +8,6 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
 		example: 'example',
 		required: false,
 	})
-	@IsOptional()
-	@MaxLength(255)
-	@IsString()
 	title?: string;
 
 	@ApiProperty({
@@ -29,8 +16,6 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
 		example: 'important meetup',
 		required: false,
 	})
-	@IsOptional()
-	@IsString()
 	description?: string;
 
 	@ApiProperty({
@@ -40,9 +25,6 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
 		type: [String],
 		required: false,
 	})
-	@IsOptional()
-	@IsDefined()
-	@IsArray()
 	flags?: string[];
 
 	@ApiProperty({
@@ -50,10 +32,6 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
 		example: '2023-02-27',
 		required: false,
 	})
-	@IsOptional()
-	@IsNotEmpty()
-	@Transform(({ value }) => new Date(value))
-	@IsDate()
 	time?: Date;
 
 	@ApiProperty({
@@ -62,7 +40,5 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
 		example: 'google meetup',
 		required: false,
 	})
-	@IsOptional()
-	@IsString()
 	place?: string;
 }

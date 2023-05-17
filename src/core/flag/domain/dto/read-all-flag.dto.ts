@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDefined, IsOptional, IsString } from 'class-validator';
 import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
 
 export class ReadAllFlagDto extends BaseReadAllDto {
@@ -10,8 +9,5 @@ export class ReadAllFlagDto extends BaseReadAllDto {
 		required: false,
 		nullable: true,
 	})
-	@IsOptional()
-	@IsDefined()
-	@IsString()
 	public name?: string;
 }

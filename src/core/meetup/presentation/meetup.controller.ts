@@ -31,7 +31,7 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
 import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 import { UserParam } from 'src/common/decorators/user.decorator';
-import { PayloadDto } from 'src/core/auth/domain/payload.dto';
+import { PayloadDto } from 'src/core/auth/domain/dto/payload.dto';
 import {
 	ApiCookieAuth,
 	ApiExtraModels,
@@ -44,17 +44,22 @@ import {
 	createMeetupLinksOptions,
 	getAllMeetupSchemaOptions,
 } from 'src/core/swagger/meetup.options';
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
+import { ReadAllMeetupSchema } from '../domain/schemas/read-all-meetup.schema';
+import { CreateMeetupSchema } from '../domain/schemas/create-meetup.schema';
+import { UpdateMeetupSchema } from '../domain/schemas/update-meetup.schema';
+import { PayloadSchema } from 'src/core/auth/domain/schemas/payload.schema';
 
 @ApiTags('Meetup')
 @ApiExtraModels(ReadAllMeetupDto, BaseReadAllDto, PayloadDto)
 @ApiCookieAuth()
 @Controller('meetup')
-@Roles('ADMIN', 'TEST')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class MeetupController {
 	constructor(readonly meetupService: MeetupService) {}
 
 	@Post('register-for-meetup/:id')
+	@Roles('ADMIN', 'USER')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Registration for the meetup' })
@@ -66,7 +71,7 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	public async joinToMeetup(
-		@UserParam() user: PayloadDto,
+		@UserParam(new JoiValidationPipe(PayloadSchema)) user: PayloadDto,
 		@Param('id') meetupId: number,
 		@TransactionParam() transaction: Transaction,
 	): Promise<FrontendMeetup> {
@@ -80,6 +85,7 @@ export class MeetupController {
 	}
 
 	@Post('unregister-for-meetup/:id')
+	@Roles('ADMIN', 'USER')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Unregistration for the meetup' })
@@ -91,7 +97,7 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	public async leaveFromMeetup(
-		@UserParam() user: PayloadDto,
+		@UserParam(new JoiValidationPipe(PayloadSchema)) user: PayloadDto,
 		@Param('id') meetupId: number,
 		@TransactionParam() transaction: Transaction,
 	): Promise<FrontendMeetup> {
@@ -104,6 +110,7 @@ export class MeetupController {
 	}
 
 	@Get()
+	@Roles('ADMIN', 'USER')
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Get all suitable meetups for the user' })
 	@ApiResponse({
@@ -114,7 +121,8 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async getAll(
-		@Query() readAllMeetupDto: ReadAllMeetupDto,
+		@Query(new JoiValidationPipe(ReadAllMeetupSchema))
+		readAllMeetupDto: ReadAllMeetupDto,
 	): Promise<ReadAllResult<FrontendMeetup>> {
 		const { pagination, sorting, ...filter } = readAllMeetupDto;
 
@@ -133,6 +141,7 @@ export class MeetupController {
 	}
 
 	@Get(':id')
+	@Roles('ADMIN', 'USER')
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Get the suitable meetup by id for the user' })
 	@ApiResponse({
@@ -149,6 +158,7 @@ export class MeetupController {
 	}
 
 	@Post()
+	@Roles('ADMIN')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Create a new meetup for the user' })
@@ -162,7 +172,8 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async create(
 		@UserParam() user: PayloadDto,
-		@Body() createMeetupDto: CreateMeetupDto,
+		@Body(new JoiValidationPipe(CreateMeetupSchema))
+		createMeetupDto: CreateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const meetup = await this.meetupService.create(
@@ -175,6 +186,7 @@ export class MeetupController {
 	}
 
 	@Put(':id')
+	@Roles('ADMIN')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Update meetup by id for the user' })
@@ -188,7 +200,8 @@ export class MeetupController {
 	async update(
 		@Param('id')
 		id: number,
-		@Body() updateMeetupDto: UpdateMeetupDto,
+		@Body(new JoiValidationPipe(UpdateMeetupSchema))
+		updateMeetupDto: UpdateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const updatedMeetup = await this.meetupService.update(
@@ -201,6 +214,7 @@ export class MeetupController {
 	}
 
 	@Delete(':id')
+	@Roles('ADMIN')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@ApiOperation({ summary: 'Delete meetup by id for the user' })

@@ -25,8 +25,10 @@ import {
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
-import { SecretData } from '../domain/secret-date.dto';
+import { SecretData } from '../domain/dto/secret-date.dto';
 import { User } from 'src/core/user/domain/user.entity';
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
+import { CreateUserSchema } from 'src/core/user/domain/schemas/create-user.schema';
 
 @ApiTags('Auth')
 @ApiExtraModels(SecretData)
@@ -68,7 +70,7 @@ export class AuthController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async registration(
-		@Body() createUserDto: CreateUserDto,
+		@Body(new JoiValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const user = await this.authService.registration(

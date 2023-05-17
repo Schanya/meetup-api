@@ -6,7 +6,7 @@ import {
 	Table,
 } from 'sequelize-typescript';
 import { User } from 'src/core/user/domain/user.entity';
-import { RoleCreationAttrs } from './role.interface';
+import { RoleCreationAttrs } from './interfaces/role.interface';
 
 @Table({ tableName: 'roles', paranoid: true })
 export class Role extends Model<Role, RoleCreationAttrs> {

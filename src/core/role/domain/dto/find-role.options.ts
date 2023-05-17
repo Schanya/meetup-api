@@ -1,10 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class RoleOptions {
 	@ApiProperty({ description: 'Role identifier', example: 1, required: false })
-	@IsOptional()
-	@IsInt()
 	id?: number;
 
 	@ApiProperty({
@@ -12,8 +9,5 @@ export class RoleOptions {
 		example: 'EXAMPLE',
 		required: false,
 	})
-	@IsOptional()
-	@MaxLength(255)
-	@IsString()
 	name?: string;
 }
