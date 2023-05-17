@@ -37,6 +37,10 @@ import { User } from '../domain/user.entity';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
 import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
+import { ReadAllUserSchema } from '../domain/schemas/read-all-user.schema';
+import { CreateUserSchema } from '../domain/schemas/create-user.schema';
+import { UpdateUserSchema } from '../domain/schemas/update-user.schema';
 
 @ApiTags('User')
 @ApiExtraModels(ReadAllUserDto, BaseReadAllDto)
@@ -58,7 +62,8 @@ export class UserController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async getAll(
-		@Query() readAllUserDto: ReadAllUserDto,
+		@Query(new JoiValidationPipe(ReadAllUserSchema))
+		readAllUserDto: ReadAllUserDto,
 	): Promise<ReadAllResult<FrontendUser>> {
 		const { pagination, sorting, ...filter } = readAllUserDto;
 
@@ -103,7 +108,7 @@ export class UserController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async create(
-		@Body() createUserDto: CreateUserDto,
+		@Body(new JoiValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const user = await this.userService.create(createUserDto, transaction);
@@ -125,7 +130,7 @@ export class UserController {
 	async update(
 		@Param('id')
 		id: number,
-		@Body() updateUserDto: UpdateUserDto,
+		@Body(new JoiValidationPipe(UpdateUserSchema)) updateUserDto: UpdateUserDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const updatedUser = await this.userService.update(

@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript';
 import { Meetup } from 'src/core/meetup/domain/meetup.entity';
 import { Role } from 'src/core/role/domain/role.entity';
-import { UserCreationAttrs } from './user.interface';
+import { UserCreationAttrs } from './interfaces/user.interface';
 
 @Table({ tableName: 'users', paranoid: true })
 export class User extends Model<User, UserCreationAttrs> {

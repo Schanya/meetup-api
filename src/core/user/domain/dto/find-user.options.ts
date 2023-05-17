@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsInt, IsOptional, MaxLength } from 'class-validator';
 
 export class UserOptions {
 	@ApiProperty({
@@ -8,8 +7,6 @@ export class UserOptions {
 		required: false,
 		nullable: true,
 	})
-	@IsOptional()
-	@IsInt()
 	id?: number;
 
 	@ApiProperty({
@@ -18,8 +15,5 @@ export class UserOptions {
 		required: false,
 		nullable: true,
 	})
-	@IsOptional()
-	@MaxLength(255)
-	@IsEmail()
 	email?: string;
 }

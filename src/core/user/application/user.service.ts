@@ -4,14 +4,14 @@ import { Transaction } from 'sequelize';
 import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
 import { ReadAllResult } from 'src/common/types/read-all.options';
-import { Role } from 'src/core/role/domain/role.entity';
 import { RoleService } from 'src/core/role/application/role.service';
-import { IReadAllUserOptions } from '../domain/read-all-user.interface';
+import { Role } from 'src/core/role/domain/role.entity';
 import { CreateUserDto } from '../domain/dto/create-user.dto';
 import { UserOptions } from '../domain/dto/find-user.options';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
+import { UserFiltration } from '../domain/filters/user.filter';
+import { IReadAllUserOptions } from '../domain/interfaces/read-all-user.interface';
 import { User } from '../domain/user.entity';
-import { UserFiltration } from '../domain/user.filter';
 
 @Injectable()
 export class UserService {
