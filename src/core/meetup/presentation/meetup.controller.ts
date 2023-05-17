@@ -54,12 +54,12 @@ import { PayloadSchema } from 'src/core/auth/domain/schemas/payload.schema';
 @ApiExtraModels(ReadAllMeetupDto, BaseReadAllDto, PayloadDto)
 @ApiCookieAuth()
 @Controller('meetup')
-@Roles('ADMIN', 'TEST')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class MeetupController {
 	constructor(readonly meetupService: MeetupService) {}
 
 	@Post('register-for-meetup/:id')
+	@Roles('ADMIN', 'USER')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Registration for the meetup' })
@@ -85,6 +85,7 @@ export class MeetupController {
 	}
 
 	@Post('unregister-for-meetup/:id')
+	@Roles('ADMIN', 'USER')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Unregistration for the meetup' })
@@ -109,6 +110,7 @@ export class MeetupController {
 	}
 
 	@Get()
+	@Roles('ADMIN', 'USER')
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Get all suitable meetups for the user' })
 	@ApiResponse({
@@ -139,6 +141,7 @@ export class MeetupController {
 	}
 
 	@Get(':id')
+	@Roles('ADMIN', 'USER')
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Get the suitable meetup by id for the user' })
 	@ApiResponse({
@@ -155,6 +158,7 @@ export class MeetupController {
 	}
 
 	@Post()
+	@Roles('ADMIN')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Create a new meetup for the user' })
@@ -182,6 +186,7 @@ export class MeetupController {
 	}
 
 	@Put(':id')
+	@Roles('ADMIN')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Update meetup by id for the user' })
@@ -209,6 +214,7 @@ export class MeetupController {
 	}
 
 	@Delete(':id')
+	@Roles('ADMIN')
 	@UseInterceptors(TransactionInterceptor)
 	@HttpCode(HttpStatus.NO_CONTENT)
 	@ApiOperation({ summary: 'Delete meetup by id for the user' })
