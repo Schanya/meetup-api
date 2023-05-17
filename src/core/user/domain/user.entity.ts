@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript';
 import { Meetup } from 'src/core/meetup/domain/meetup.entity';
 import { Role } from 'src/core/role/domain/role.entity';
-import { UserCreationAttrs } from '../infrastructure/user.interface';
+import { UserCreationAttrs } from './user.interface';
 
 @Table({ tableName: 'users', paranoid: true })
 export class User extends Model<User, UserCreationAttrs> {
@@ -29,6 +29,9 @@ export class User extends Model<User, UserCreationAttrs> {
 	@BelongsToMany(() => Role, 'users_roles', 'user_id', 'role_id')
 	roles: Role[];
 
-	@HasMany(() => Meetup)
+	@HasMany(() => Meetup, 'author_id')
 	meetups: Meetup[];
+
+	@BelongsToMany(() => Meetup, 'meetups_users', 'user_id', 'meetup_id')
+	invitedToMeetups: Meetup[];
 }
