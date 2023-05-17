@@ -1,13 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import {
-	IsArray,
-	IsDate,
-	IsDefined,
-	IsNotEmpty,
-	IsString,
-	MaxLength,
-} from 'class-validator';
 
 export class CreateMeetupDto {
 	@ApiProperty({
@@ -15,9 +6,6 @@ export class CreateMeetupDto {
 		example: 'Example',
 		required: true,
 	})
-	@IsNotEmpty()
-	@MaxLength(255)
-	@IsString()
 	title: string;
 
 	@ApiProperty({
@@ -25,7 +13,6 @@ export class CreateMeetupDto {
 		example: 'important meetup',
 		required: false,
 	})
-	@IsString()
 	description?: string;
 
 	@ApiProperty({
@@ -34,9 +21,6 @@ export class CreateMeetupDto {
 		example: ['EXAMPLE', 'TEST'],
 		required: true,
 	})
-	@IsDefined()
-	@IsArray()
-	@IsString({ each: true })
 	flags: string[];
 
 	@ApiProperty({
@@ -44,9 +28,6 @@ export class CreateMeetupDto {
 		example: '2023-02-27',
 		required: true,
 	})
-	@IsNotEmpty()
-	@Transform(({ value }) => new Date(value))
-	@IsDate()
 	time: Date;
 
 	@ApiProperty({
@@ -55,7 +36,5 @@ export class CreateMeetupDto {
 		example: 'google meetup',
 		required: true,
 	})
-	@IsNotEmpty()
-	@IsString()
 	place: string;
 }

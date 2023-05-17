@@ -7,18 +7,19 @@ import { defaultSorting } from 'src/common/constants/sorting.constants';
 import { ReadAllResult } from 'src/common/types/read-all.options';
 
 import { CreateFlagDto } from '../domain/dto/create-flag.dto';
-import { FlagOptions } from '../domain/dto/find-flag.options';
+import { UpdateFlagDto } from '../domain/dto/update-flag.dto';
 
-import { IReadAllFlagOptions } from '../domain/read-all-flag.interface';
+import { IReadAllFlagOptions } from '../domain/interfaces/read-all-flag.interface';
 
+import { FlagFiltration } from '../domain/filters/flag.filter';
 import { Flag } from '../domain/flag.entity';
-import { FlagFiltration } from '../domain/flag.filter';
+import { FindFlagOptions } from '../domain/dto/find-flag.options';
 
 @Injectable()
 export class FlagService {
 	constructor(@InjectModel(Flag) private flagRepository: typeof Flag) {}
 
-	public async findOne(options: FlagOptions): Promise<Flag> {
+	public async findOne(options: FindFlagOptions): Promise<Flag> {
 		const suitableFlag = await this.findBy({ ...options });
 
 		if (!suitableFlag) {
@@ -50,7 +51,7 @@ export class FlagService {
 		};
 	}
 
-	public async findBy(options: FlagOptions): Promise<Flag> {
+	public async findBy(options: FindFlagOptions): Promise<Flag> {
 		const suitableFlag = await this.flagRepository.findOne({
 			where: { ...options },
 			include: { all: true },
@@ -69,7 +70,7 @@ export class FlagService {
 		return await this.flagRepository.create(createFlagDto);
 	}
 
-	public async update(id: number, flagOptions: FlagOptions): Promise<Flag> {
+	public async update(id: number, flagOptions: UpdateFlagDto): Promise<Flag> {
 		const existingFlag = await this.findBy({ id: id });
 
 		if (!existingFlag) {

@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 import { Role } from 'src/core/role/domain/role.entity';
 
 export class PayloadDto {
@@ -9,8 +8,6 @@ export class PayloadDto {
 		required: true,
 		nullable: false,
 	})
-	@IsNotEmpty()
-	@IsString()
 	id: number;
 
 	@ApiProperty({
@@ -19,8 +16,6 @@ export class PayloadDto {
 		required: true,
 		nullable: false,
 	})
-	@IsNotEmpty()
-	@IsString()
 	email: string;
 
 	@ApiProperty({
@@ -30,7 +25,5 @@ export class PayloadDto {
 		required: true,
 		nullable: false,
 	})
-	@IsNotEmpty()
-	@IsArray()
 	roles: Role[];
 }

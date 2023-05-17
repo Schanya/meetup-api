@@ -33,6 +33,10 @@ import {
 import { Roles } from 'src/common/decorators/role.decorator';
 import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
 import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
+import { ReadAllRoleSchema } from '../domain/schemas/read-all-role.schema';
+import { CreateRoleSchema } from '../domain/schemas/create-role.schema';
+import { UpdateRoleSchema } from '../domain/schemas/update-role.schema';
 
 @ApiTags('Role')
 @ApiExtraModels(ReadAllRoleDto, BaseReadAllDto)
@@ -54,7 +58,8 @@ export class RoleController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async getAll(
-		@Query() readAllRoleDto: ReadAllRoleDto,
+		@Query(new JoiValidationPipe(ReadAllRoleSchema))
+		readAllRoleDto: ReadAllRoleDto,
 	): Promise<ReadAllResult<FrontendRole>> {
 		const { pagination, sorting, ...filter } = readAllRoleDto;
 
@@ -97,7 +102,9 @@ export class RoleController {
 	})
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-	async create(@Body() createRoleDto: CreateRoleDto) {
+	async create(
+		@Body(new JoiValidationPipe(CreateRoleSchema)) createRoleDto: CreateRoleDto,
+	) {
 		const createdRole = await this.roleService.create(createRoleDto);
 
 		return new FrontendRole(createdRole);
@@ -116,7 +123,7 @@ export class RoleController {
 	async update(
 		@Param('id')
 		id: number,
-		@Body() updateRoleDto: UpdateRoleDto,
+		@Body(new JoiValidationPipe(UpdateRoleSchema)) updateRoleDto: UpdateRoleDto,
 	) {
 		const updatedRole = await this.roleService.update(id, updateRoleDto);
 

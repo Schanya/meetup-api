@@ -31,7 +31,7 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
 import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
 import { UserParam } from 'src/common/decorators/user.decorator';
-import { PayloadDto } from 'src/core/auth/domain/payload.dto';
+import { PayloadDto } from 'src/core/auth/domain/dto/payload.dto';
 import {
 	ApiCookieAuth,
 	ApiExtraModels,
@@ -44,6 +44,11 @@ import {
 	createMeetupLinksOptions,
 	getAllMeetupSchemaOptions,
 } from 'src/core/swagger/meetup.options';
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
+import { ReadAllMeetupSchema } from '../domain/schemas/read-all-meetup.schema';
+import { CreateMeetupSchema } from '../domain/schemas/create-meetup.schema';
+import { UpdateMeetupSchema } from '../domain/schemas/update-meetup.schema';
+import { PayloadSchema } from 'src/core/auth/domain/schemas/payload.schema';
 
 @ApiTags('Meetup')
 @ApiExtraModels(ReadAllMeetupDto, BaseReadAllDto, PayloadDto)
@@ -66,7 +71,7 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	public async joinToMeetup(
-		@UserParam() user: PayloadDto,
+		@UserParam(new JoiValidationPipe(PayloadSchema)) user: PayloadDto,
 		@Param('id') meetupId: number,
 		@TransactionParam() transaction: Transaction,
 	): Promise<FrontendMeetup> {
@@ -91,7 +96,7 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	public async leaveFromMeetup(
-		@UserParam() user: PayloadDto,
+		@UserParam(new JoiValidationPipe(PayloadSchema)) user: PayloadDto,
 		@Param('id') meetupId: number,
 		@TransactionParam() transaction: Transaction,
 	): Promise<FrontendMeetup> {
@@ -114,7 +119,8 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async getAll(
-		@Query() readAllMeetupDto: ReadAllMeetupDto,
+		@Query(new JoiValidationPipe(ReadAllMeetupSchema))
+		readAllMeetupDto: ReadAllMeetupDto,
 	): Promise<ReadAllResult<FrontendMeetup>> {
 		const { pagination, sorting, ...filter } = readAllMeetupDto;
 
@@ -162,7 +168,8 @@ export class MeetupController {
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async create(
 		@UserParam() user: PayloadDto,
-		@Body() createMeetupDto: CreateMeetupDto,
+		@Body(new JoiValidationPipe(CreateMeetupSchema))
+		createMeetupDto: CreateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const meetup = await this.meetupService.create(
@@ -188,7 +195,8 @@ export class MeetupController {
 	async update(
 		@Param('id')
 		id: number,
-		@Body() updateMeetupDto: UpdateMeetupDto,
+		@Body(new JoiValidationPipe(UpdateMeetupSchema))
+		updateMeetupDto: UpdateMeetupDto,
 		@TransactionParam() transaction: Transaction,
 	) {
 		const updatedMeetup = await this.meetupService.update(

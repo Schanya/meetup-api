@@ -1,15 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import {
-	IsArray,
-	IsDate,
-	IsDefined,
-	IsInt,
-	IsNotEmpty,
-	IsOptional,
-	IsString,
-	MaxLength,
-} from 'class-validator';
 
 export class MeetupOptions {
 	@ApiProperty({
@@ -17,8 +6,6 @@ export class MeetupOptions {
 		example: 1,
 		required: false,
 	})
-	@IsOptional()
-	@IsInt()
 	id?: number;
 
 	@ApiProperty({
@@ -26,9 +13,6 @@ export class MeetupOptions {
 		example: 'Example',
 		required: false,
 	})
-	@IsOptional()
-	@MaxLength(255)
-	@IsString()
 	title?: string;
 
 	@ApiProperty({
@@ -36,8 +20,6 @@ export class MeetupOptions {
 		example: 'important meetup',
 		required: false,
 	})
-	@IsOptional()
-	@IsString()
 	description?: string;
 
 	@ApiProperty({
@@ -46,10 +28,6 @@ export class MeetupOptions {
 		example: ['EXAMPLE', 'TEST'],
 		required: false,
 	})
-	@IsOptional()
-	@IsDefined()
-	@IsArray()
-	@IsString({ each: true })
 	flags?: string[];
 
 	@ApiProperty({
@@ -57,10 +35,6 @@ export class MeetupOptions {
 		example: '2023-02-27',
 		required: false,
 	})
-	@IsOptional()
-	@IsNotEmpty()
-	@Transform(({ value }) => new Date(value))
-	@IsDate()
 	time?: Date;
 
 	@ApiProperty({
@@ -69,7 +43,5 @@ export class MeetupOptions {
 		example: 'google meetup',
 		required: false,
 	})
-	@IsOptional()
-	@IsString()
 	place?: string;
 }
