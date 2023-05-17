@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateFlagDto {
 	@ApiProperty({
@@ -8,8 +7,5 @@ export class CreateFlagDto {
 		nullable: false,
 		required: true,
 	})
-	@IsNotEmpty()
-	@MaxLength(255)
-	@IsString()
 	name: string;
 }

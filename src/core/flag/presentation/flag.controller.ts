@@ -25,17 +25,21 @@ import {
 } from 'src/core/swagger/flag.options';
 
 import { ReadAllResult } from 'src/common/types/read-all.options';
-import { Flag } from '../domain/flag.entity';
 import { FlagService } from '../application/flag.service';
 import { CreateFlagDto } from '../domain/dto/create-flag.dto';
-import { FlagOptions } from '../domain/dto/find-flag.options';
+import { UpdateFlagDto } from '../domain/dto/update-flag.dto';
 import { ReadAllFlagDto } from '../domain/dto/read-all-flag.dto';
+import { Flag } from '../domain/flag.entity';
 
-import { FrontendFlag } from '../domain/types/flag.type';
-import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { BaseReadAllDto } from 'src/common/dto/base-read-all.dto';
+import { JoiValidationPipe } from 'src/common/pipes/joi-validation.pipe';
 import { JwtAuthGuard } from 'src/core/auth/domain/guards/jwt.guard';
 import { RolesGuard } from 'src/core/auth/domain/guards/role.guard';
+import { CreateFlagSchema } from '../domain/schemas/create-flag.schema';
+import { FrontendFlag } from '../domain/types/flag.type';
+import { UpdateFlagSchema } from '../domain/schemas/update-flag.schema';
+import { ReadAllFlagSchema } from '../domain/schemas/read-all-flag.schema';
 
 @ApiTags('Flag')
 @ApiExtraModels(ReadAllFlagDto, BaseReadAllDto)
@@ -57,7 +61,8 @@ export class FlagController {
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
 	async getAll(
-		@Query() readAllFlagDto: ReadAllFlagDto,
+		@Query(new JoiValidationPipe(ReadAllFlagSchema))
+		readAllFlagDto: ReadAllFlagDto,
 	): Promise<ReadAllResult<FrontendFlag>> {
 		const { pagination, sorting, ...filter } = readAllFlagDto;
 
@@ -100,7 +105,9 @@ export class FlagController {
 	})
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-	async create(@Body() createFlagDto: CreateFlagDto) {
+	async create(
+		@Body(new JoiValidationPipe(CreateFlagSchema)) createFlagDto: CreateFlagDto,
+	) {
 		const createdFlag = await this.flagService.create(createFlagDto);
 
 		return new FrontendFlag(createdFlag);
@@ -116,7 +123,10 @@ export class FlagController {
 	})
 	@ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
 	@ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-	async update(@Param('id') id: number, @Body() flagOptions: FlagOptions) {
+	async update(
+		@Param('id') id: number,
+		@Body(new JoiValidationPipe(UpdateFlagSchema)) flagOptions: UpdateFlagDto,
+	) {
 		const updatedFlag = await this.flagService.update(id, flagOptions);
 
 		return new FrontendFlag(updatedFlag);
