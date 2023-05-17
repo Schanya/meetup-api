@@ -11,9 +11,9 @@ import { defaultPagination } from 'src/common/constants/pagination.constants';
 import { defaultSorting } from 'src/common/constants/sorting.constants';
 
 import { ReadAllResult } from 'src/common/types/read-all.options';
-import { IReadAllMeetupOptions } from '../domain/read-all-meetup.interface';
+import { IReadAllMeetupOptions } from '../domain/interfaces/read-all-meetup.interface';
 
-import { MeetupFiltration } from '../domain/meetup.filter';
+import { MeetupFiltration } from '../domain/filters/meetup.filter';
 
 import { CreateMeetupDto } from '../domain/dto/create-meetup.dto';
 import { MeetupOptions } from '../domain/dto/find-meetup.options';
@@ -217,6 +217,16 @@ export class MeetupService {
 		updatedMeetups[0].flags = newFlags?.length
 			? newFlags
 			: existingMeetup.flags;
+
+		const members = await updatedMeetups[0].$get('members', {
+			transaction,
+		});
+		updatedMeetups[0].members = members;
+
+		const author = await updatedMeetups[0].$get('author', {
+			transaction,
+		});
+		updatedMeetups[0].author = author;
 
 		return updatedMeetups[0];
 	}
