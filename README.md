@@ -78,5 +78,6 @@ $ npm run test:cov
 
 ## Deployed 
 
-Link to live project https://meetup-api-kesc.onrender.com/doc#
-Default  username: admin@gmail.com password:admin
+Link to live project https://meetup-api-kesc.onrender.com/doc# 
+</br>
+Default  username: admin@gmail.com password: admin
