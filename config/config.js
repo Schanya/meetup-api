@@ -1,5 +1,5 @@
-import { config } from 'dotenv';
-config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 module.exports = {
     "production": {
